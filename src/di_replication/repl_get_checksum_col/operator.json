@@ -1,0 +1,33 @@
+{
+    "description": "Get Checksum Column",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "data",
+            "type": "message.table",
+            "description": "Input data"
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "msg",
+            "type": "message",
+            "description": "msg with sql statement"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/sdi_replication.repl_get_checksum_col.configSchema.json",
+        "script": "file://repl_get_checksum_col.py",
+        "debug_mode": true,
+        "replication_repos": "REPLICATION.TEST_TABLE_REPOS"
+    },
+    "tags": {
+        "sdi_utils": ""
+    },
+    "iconsrc": "repl_get_checksum_col.svg"
+}

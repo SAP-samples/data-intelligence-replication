@@ -1,0 +1,37 @@
+{
+    "description": "table to json",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "data",
+            "type": "message.table",
+            "description": "Input message with table"
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "csv",
+            "type": "message.file",
+            "description": "Output data as csv"
+        },
+        {
+            "name": "error",
+            "type": "message",
+            "description": "Error status"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/sdi_replication.repl_table_json.configSchema.json",
+        "script": "file://repl_table_json.py",
+        "debug_mode": true
+    },
+    "tags": {
+        "sdi_utils": ""
+    },
+    "iconsrc": "repl_table_json.svg"
+}

@@ -1,0 +1,42 @@
+{
+    "description": "Dispatch Merge Files",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "target",
+            "type": "message.file",
+            "description": "Target file"
+        },
+        {
+            "name": "init",
+            "type": "message.file",
+            "description": "Init"
+        },
+        {
+            "name": "next",
+            "type": "message.*",
+            "description": "Next"
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "file",
+            "type": "message.file",
+            "description": "file"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/sdi_replication.repl_dispatch_merge_files.configSchema.json",
+        "script": "file://repl_dispatch_merge_files.py",
+        "debug_mode": true
+    },
+    "tags": {
+        "sdi_utils": ""
+    },
+    "iconsrc": "repl_dispatch_merge_files.svg"
+}

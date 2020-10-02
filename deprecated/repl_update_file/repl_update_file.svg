@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <g transform="matrix(0.824529, 0, 0, 0.824808, 42.31142, 82.795563)" style="">
+    <rect x="171.295" y="93.931" width="315.533" height="369.394" style="fill: rgb(216, 216, 216); stroke-width: 11px; stroke: rgb(90, 90, 90);"/>
+    <line style="stroke-width: 10px; stroke: rgb(245, 161, 40);" x1="205.92" y1="150.838" x2="444.689" y2="150.623"/>
+    <line style="stroke: rgb(86, 85, 85); stroke-width: 10px; fill: rgb(221, 0, 0);" x1="205.696" y1="254.79" x2="444.465" y2="254.575"/>
+    <line style="stroke-width: 10px; fill: rgb(186, 218, 85); stroke: rgb(245, 161, 40);" x1="205.697" y1="202.814" x2="444.465" y2="202.598"/>
+    <line style="stroke-width: 10px; stroke: rgb(245, 161, 40);" x1="205.92" y1="306.765" x2="444.689" y2="306.55"/>
+    <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="205.92" y1="358.74" x2="444.689" y2="358.528"/>
+    <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="205.697" y1="410.717" x2="444.465" y2="410.503"/>
+  </g>
+  <g transform="matrix(0.579271, 0, 0, 0.561406, -92.672546, -94.047813)" style="">
+    <rect x="189.71" y="206.113" width="315.533" height="211.965" style="fill: rgb(216, 216, 216); stroke-width: 11px; stroke: rgb(90, 90, 90);" rx="7.089" ry="7.089"/>
+    <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="224.335" y1="263.02" x2="463.104" y2="262.805"/>
+    <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="224.111" y1="366.972" x2="462.88" y2="366.757"/>
+    <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="224.112" y1="314.996" x2="462.88" y2="314.78"/>
+    <path d="M 0 338.423 H 111.514 L 111.514 318.175 L 172.64 370.996 L 111.514 423.817 L 111.514 403.569 H 0 V 338.423 Z" style="stroke: rgb(186, 218, 85); fill: rgb(245, 161, 40);" transform="matrix(0.788965, 0.614438, -0.590666, 0.807479, 540.974548, 161.158371)"/>
+  </g>
+</svg>

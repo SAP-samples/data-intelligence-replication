@@ -1,0 +1,28 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "http://sap.com/vflow/sdi_replication.repl_block.configSchema.json",
+    "type": "object",
+    "properties": {
+        "codelanguage": {
+            "type": "string"
+        },
+        "script": {
+            "type": "string"
+        },
+        "debug_mode": {
+            "title": "Debug mode",
+            "description": "Sending debug level information to log port",
+            "type": "boolean"
+        },
+        "use_package_id": {
+            "title": "Using Package ID",
+            "description": "Using Package ID rather than generated packages by package size",
+            "type": "boolean"
+        },
+        "change_types": {
+            "title": "Insert ('I'), update ('U'), delete ('D')",
+            "description": "Insert ('I'), update ('U'), delete ('D')",
+            "type": "string"
+        }
+    }
+}

@@ -1,0 +1,32 @@
+{
+    "description": "Get Check Profile of Table",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "data",
+            "type": "message.table",
+            "description": "Input data"
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "msg",
+            "type": "message",
+            "description": "msg with sql statement"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/sdi_replication.repl_get_check_profile.configSchema.json",
+        "script": "file://repl_get_check_profile.py",
+        "debug_mode": true
+    },
+    "tags": {
+        "sdi_utils": ""
+    },
+    "iconsrc": "repl_get_check_profile.svg"
+}

@@ -1,0 +1,32 @@
+{
+    "description": "Repl. Dispatch Test Tables",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "tables",
+            "type": "message.table",
+            "description": "List of tables"
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "trigger",
+            "type": "message",
+            "description": "trigger"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/sdi_replication.repl_dispatch_test_tables.configSchema.json",
+        "script": "file://repl_dispatch_test_tables.py",
+        "debug_mode": true
+    },
+    "tags": {
+        "sdi_utils": ""
+    },
+    "iconsrc": "repl_dispatch_test_tables.svg"
+}

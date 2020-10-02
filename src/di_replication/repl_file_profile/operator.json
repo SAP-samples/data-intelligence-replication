@@ -1,0 +1,32 @@
+{
+    "description": "File Profiles",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "data",
+            "type": "message.file",
+            "description": "Input message"
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "sql",
+            "type": "message",
+            "description": "sql"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/sdi_replication.repl_file_profile.configSchema.json",
+        "script": "file://repl_file_profile.py",
+        "debug_mode": true
+    },
+    "tags": {
+        "sdi_utils": ""
+    },
+    "iconsrc": "repl_file_profile.svg"
+}

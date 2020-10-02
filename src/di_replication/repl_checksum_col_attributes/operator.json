@@ -1,0 +1,33 @@
+{
+    "description": "Checksum Column to Attributes",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "data",
+            "type": "message.table",
+            "description": "Input data"
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "msg",
+            "type": "message.*",
+            "description": "msg"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/sdi_replication.repl_checksum_col_attributes.configSchema.json",
+        "script": "file://repl_checksum_col_attributes.py",
+        "debug_mode": true,
+        "file_path_att": "P"
+    },
+    "tags": {
+        "sdi_utils": ""
+    },
+    "iconsrc": "repl_checksum_col_attributes.svg"
+}

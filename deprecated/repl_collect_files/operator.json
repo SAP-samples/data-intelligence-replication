@@ -1,0 +1,32 @@
+{
+    "description": "Repl. Collect Files",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "files",
+            "type": "message.file",
+            "description": "List of files"
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "file",
+            "type": "message.file",
+            "description": "file"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/sdi_replication.repl_collect_files.configSchema.json",
+        "script": "file://repl_collect_files.py",
+        "debug_mode": true
+    },
+    "tags": {
+        "sdi_utils": ""
+    },
+    "iconsrc": "repl_collect_files.svg"
+}

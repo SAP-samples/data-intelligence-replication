@@ -1,0 +1,33 @@
+{
+    "description": "Add Test Data",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "data",
+            "type": "message.table",
+            "description": "Input data"
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "table",
+            "type": "message.table",
+            "description": "msg with table"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/sdi_replication.repl_add_test_data.configSchema.json",
+        "script": "file://repl_add_test_data.py",
+        "debug_mode": true,
+        "num_data": 10
+    },
+    "tags": {
+        "sdi_utils": ""
+    },
+    "iconsrc": "repl_add_test_data.svg"
+}

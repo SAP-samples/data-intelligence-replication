@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "http://sap.com/vflow/sdi_replication.repl_dispatch_tables.configSchema.json",
+    "type": "object",
+    "properties": {
+        "codelanguage": {
+            "type": "string"
+        },
+        "script": {
+            "type": "string"
+        },
+        "debug_mode": {
+            "title": "Debug mode",
+            "description": "Sending debug level information to log port",
+            "type": "boolean"
+        },
+        "periodicity": {
+            "title": "Periodicity (s)",
+            "description": "Periodicity (s).",
+            "type": "integer"
+        },
+        "round_trips_to_stop": {
+            "title": "Roundtips to stop",
+            "description": "Fraction of tables to parallelize.",
+            "type": "integer"
+        },
+        "count_all_roundtrips": {
+            "title": "Count All Roundtrips",
+            "description": "Count all roundtrips irrespective to changes.",
+            "type": "boolean"
+        }
+    }
+}

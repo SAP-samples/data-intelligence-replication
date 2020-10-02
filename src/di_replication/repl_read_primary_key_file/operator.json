@@ -1,0 +1,32 @@
+{
+    "description": "Read Primary Key",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "input",
+            "type": "message.file",
+            "description": "Input"
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "base",
+            "type": "message.file",
+            "description": "Output"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/sdi_replication.repl_read_primary_key_file.configSchema.json",
+        "script": "file://repl_read_primary_key.py",
+        "debug_mode": true
+    },
+    "tags": {
+        "sdi_utils": ""
+    },
+    "iconsrc": "repl_read_primary_keys.svg"
+}

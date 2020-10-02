@@ -1,0 +1,38 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "http://sap.com/vflow/sdi_replication.repl_dispatch_files.configSchema.json",
+    "type": "object",
+    "properties": {
+        "codelanguage": {
+            "type": "string"
+        },
+        "script": {
+            "type": "string"
+        },
+        "debug_mode": {
+            "title": "Debug mode",
+            "description": "Sending debug level information to log port",
+            "type": "boolean"
+        },
+        "file_path_att": {
+            "title": "File Path Attribute (B/P/C)",
+            "description": "Set File Path Attribute (B-ase/P-rimary Key/C-onsitency)",
+            "type": "string"
+        },
+        "update_files_mandatory": {
+            "title": "Update Files mandatory",
+            "description": "Update files mandatory",
+            "type": "boolean"
+        },
+        "base_file_mandatory": {
+            "title": "Base File mandatory",
+            "description": "Base file mandatory",
+            "type": "boolean"
+        },
+        "primary_key_file_mandatory": {
+            "title": "Primary Key File mandatory",
+            "description": "Primary key file mandatory",
+            "type": "boolean"
+        }
+    }
+}

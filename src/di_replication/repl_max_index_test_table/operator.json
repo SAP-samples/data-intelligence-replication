@@ -1,0 +1,32 @@
+{
+    "description": "Max Index Test Tables",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "data",
+            "type": "message",
+            "description": "Input data"
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "sql",
+            "type": "message",
+            "description": "msg with sql"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/sdi_replication.repl_max_index_test_table.configSchema.json",
+        "script": "file://repl_max_index_test_table.py",
+        "debug_mode": true
+    },
+    "tags": {
+        "sdi_utils": ""
+    },
+    "iconsrc": "repl_max_index_test_table.svg"
+}

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <rect x="75.647" y="95.461" width="340.863" height="42.192" style="fill: rgb(172, 172, 172);"/>
+  <rect x="75.968" y="137.653" width="340.542" height="239.14" style="fill: rgb(216, 213, 213);"/>
+  <rect x="75.647" y="92.985" width="341.184" height="283.808" style="stroke-width: 11px; stroke: rgb(90, 90, 90); fill: none;"/>
+  <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="75.327" y1="137.653" x2="416.831" y2="137.488"/>
+  <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="75.327" y1="217.52" x2="416.831" y2="217.355"/>
+  <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="75.006" y1="177.587" x2="416.51" y2="177.421"/>
+  <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="75.327" y1="257.453" x2="416.831" y2="257.288"/>
+  <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="75.327" y1="297.386" x2="416.831" y2="297.223"/>
+  <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="75.006" y1="337.32" x2="416.51" y2="337.156"/>
+  <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="155.18" y1="95.461" x2="155.509" y2="379.269"/>
+  <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="250.116" y1="95.461" x2="250.164" y2="379.269"/>
+  <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="342.167" y1="95.461" x2="343.101" y2="379.269"/>
+  <rect x="41.881" y="73.576" width="400" height="121.228" style="stroke: rgb(245, 161, 40); stroke-width: 11px; fill: none;"/>
+</svg>

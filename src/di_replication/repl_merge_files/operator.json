@@ -1,0 +1,42 @@
+{
+    "description": "Merge Files",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "data",
+            "type": "message.file",
+            "description": "Input Data as csv"
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "csv",
+            "type": "message.file",
+            "description": "Output data as csv"
+        },
+        {
+            "name": "next",
+            "type": "message.file",
+            "description": "Next file"
+        },
+        {
+            "name": "consistency",
+            "type": "message",
+            "description": "sql consistency update"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/sdi_replication.repl_merge_files.configSchema.json",
+        "script": "file://repl_merge_files.py",
+        "debug_mode": true
+    },
+    "tags": {
+        "sdi_utils": ""
+    },
+    "iconsrc": "repl_merge_files.svg"
+}

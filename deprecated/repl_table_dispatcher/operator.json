@@ -1,0 +1,47 @@
+{
+    "description": "Repl. Table Dispatcher",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "tables",
+            "type": "message.table",
+            "description": "List of tables"
+        },
+        {
+            "name": "trigger",
+            "type": "message",
+            "description": "Trigger"
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "trigger",
+            "type": "message",
+            "description": "trigger"
+        },
+        {
+            "name": "limit",
+            "type": "message",
+            "description": "limit"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/sdi_replication.repl_table_dispatcher.configSchema.json",
+        "script": "file://repl_table_dispatcher.py",
+        "debug_mode": true,
+        "periodicity": 0,
+        "parallelization": 1,
+        "round_trips_to_stop": 1,
+        "count_all_roundtrips": false,
+        "change_type": "I"
+    },
+    "tags": {
+        "sdi_utils": ""
+    },
+    "iconsrc": "repl_table_dispatcher.svg"
+}

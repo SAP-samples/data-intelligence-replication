@@ -1,0 +1,28 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "http://sap.com/vflow/sdi_replication.repl_create_test_tables.configSchema.json",
+    "type": "object",
+    "properties": {
+        "codelanguage": {
+            "type": "string"
+        },
+        "script": {
+            "type": "string"
+        },
+        "debug_mode": {
+            "title": "Debug mode",
+            "description": "Sending debug level information to log port",
+            "type": "boolean"
+        },
+        "num_tables": {
+            "title": "Number of tables",
+            "description": "Number of tables.",
+            "type": "integer"
+        },
+        "base_table_name": {
+            "title": "Base Table Name",
+            "description": "Base Table Name.",
+            "type": "string"
+        }
+    }
+}
