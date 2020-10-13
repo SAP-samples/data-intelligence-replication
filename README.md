@@ -1,5 +1,4 @@
 # Replication with SAP Data Intelligence
-(sdi_replication) by thhapke
 
 ## Description 
 ### Introduction
@@ -203,7 +202,7 @@ All operators and pipelines are packed as solution that can be dowloaded from [.
 There are currently no know issues. 
 
 ## How to obtain support
-This is an example code without any commitment for getting support. Nonetheless please contact me (thorsten.hapke@sap.com) if you have any questions or have run into an issue. 
+This is an example code without any commitment for getting support. Nonetheless you could create an issue in Github if you have any or for your questions . 
 
 ## Contributing
 Due to fact that this might be an interim solution for the next 6 Months there is no further development planned. If there are ideas or contributions that might be of interest for others then please let me know. We then can figure out how to incorporate them. 
