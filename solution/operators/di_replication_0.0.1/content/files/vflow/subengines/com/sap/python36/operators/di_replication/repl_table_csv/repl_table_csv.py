@@ -130,7 +130,7 @@ outports = [{'name': 'log', 'type': 'string',"description":"Logging data"}, \
             {'name': 'error', 'type': 'message',"description":"Error status"}]
 
 
-#api.set_port_callback(inports[0]['name'], process)
+api.set_port_callback(inports[0]['name'], process)
 
 def test_operator() :
     #api.config.drop_header = False
@@ -153,23 +153,3 @@ def test_operator() :
 
 
 
-if __name__ == '__main__':
-    test_operator()
-    if True :
-        basename = os.path.basename(__file__[:-3])
-        package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
-        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-        solution_name = '{}_{}.zip'.format(basename,api.config.version)
-        package_name_ver = '{}_{}'.format(package_name,api.config.version)
-
-        solution_dir = os.path.join(project_dir,'solution/operators',package_name_ver)
-        solution_file = os.path.join(project_dir,'solution/operators',solution_name)
-
-        # rm solution directory
-        subprocess.run(["rm", '-r',solution_dir])
-
-        # create solution directory with generated operator files
-        gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-
-        # Bundle solution directory with generated operator files
-        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t",solution_file])

@@ -1,11 +1,9 @@
 import sdi_utils.gensolution as gs
-import sdi_utils.set_logging as slog
-import sdi_utils.textfield_parser as tfp
-import sdi_utils.tprogress as tp
-
 import subprocess
-import logging
 import os
+
+import logging
+import io
 import random
 from datetime import datetime, timezone, timedelta
 import pandas as pd
@@ -35,18 +33,13 @@ except NameError:
             ## Meta data
             config_params = dict()
             version = '0.0.1'
-            tags = {'sdi_utils': ''}
+            tags = {}
             operator_name = 'repl_update_test_tables'
             operator_description = "Update Test Tables"
 
             operator_description_long = "Update test tables with incremental value."
             add_readme = dict()
             add_readme["References"] = ""
-
-            debug_mode = True
-            config_params['debug_mode'] = {'title': 'Debug mode',
-                                           'description': 'Sending debug level information to log port',
-                                           'type': 'boolean'}
 
             modulo_factor = 2
             config_params['modulo_factor'] = {'title': 'Modulo Factor',
@@ -59,11 +52,18 @@ except NameError:
                                            'description': 'Maximum random number.',
                                            'type': 'integer'}
 
+        logger = logging.getLogger(name=config.operator_name)
+
+# catching logger messages for separate output
+log_stream = io.StringIO()
+sh = logging.StreamHandler(stream=log_stream)
+sh.setFormatter(logging.Formatter('%(asctime)s ;  %(levelname)s ; %(name)s ; %(message)s', datefmt='%H:%M:%S'))
+api.logger.addHandler(sh)
+
 def process(msg):
 
     att = dict(msg.attributes)
     operator_name = 'repl_update_test_tables'
-    logger, log_stream = slog.set_logging(operator_name, loglevel=api.config.debug_mode)
 
     modulo_factor = api.config.modulo_factor
     maxn = api.config.max_random_num
@@ -73,7 +73,7 @@ def process(msg):
           ' \"DIREPL_UPDATED\" = CURRENT_UTCTIMESTAMP WHERE MOD(\"INDEX\",{mf}) = {of}'  \
         .format(table = att['replication_table'],maxn = maxn, mf= modulo_factor,of= offset)
 
-    logger.info('SQL statement: {}'.format(sql))
+    api.logger.info('SQL statement: {}'.format(sql))
     att['sql'] = sql
 
     api.send(outports[1]['name'], api.Message(attributes=att,body=sql))
@@ -104,11 +104,21 @@ def test_operator():
 if __name__ == '__main__':
     test_operator()
     if True:
-        print(os.getcwd())
-        subprocess.run(["rm", '-r','../../../solution/operators/sdi_replication_' + api.config.version])
+        basename = os.path.basename(__file__[:-3])
+        package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
+        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        solution_name = '{}_{}.zip'.format(basename,api.config.version)
+        package_name_ver = '{}_{}'.format(package_name,api.config.version)
+
+        solution_dir = os.path.join(project_dir,'solution/operators',package_name_ver)
+        solution_file = os.path.join(project_dir,'solution/operators',solution_name)
+
+        # rm solution directory
+        subprocess.run(["rm", '-r',solution_dir])
+
+        # create solution directory with generated operator files
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-        solution_name = api.config.operator_name + '_' + api.config.version
-        subprocess.run(["vctl", "solution", "bundle",'../../../solution/operators/sdi_replication_' + api.config.version, \
-                        "-t", solution_name])
-        subprocess.run(["mv", solution_name + '.zip', '../../../solution/operators'])
+
+        # Bundle solution directory with generated operator files
+        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t",solution_file])
 

@@ -21,14 +21,11 @@
         }
     ],
     "config": {
-        "$type": "http://sap.com/vflow/sdi_replication.repl_update_test_tables.configSchema.json",
+        "$type": "http://sap.com/vflow/di_replication.repl_update_test_tables.configSchema.json",
         "script": "file://repl_update_test_tables.py",
-        "debug_mode": true,
         "modulo_factor": 2,
         "max_random_num": 10000
     },
-    "tags": {
-        "sdi_utils": ""
-    },
+    "tags": {},
     "iconsrc": "repl_update_test_tables.svg"
 }

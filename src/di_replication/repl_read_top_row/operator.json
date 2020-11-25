@@ -4,7 +4,7 @@
     "inports": [
         {
             "name": "data",
-            "type": "message.table",
+            "type": "message",
             "description": "Input data"
         }
     ],
@@ -21,12 +21,9 @@
         }
     ],
     "config": {
-        "$type": "http://sap.com/vflow/sdi_replication.repl_read_top_row.configSchema.json",
-        "script": "file://repl_read_top_row.py",
-        "debug_mode": true
+        "$type": "http://sap.com/vflow/di_replication.repl_read_top_row.configSchema.json",
+        "script": "file://repl_read_top_row.py"
     },
-    "tags": {
-        "sdi_utils": ""
-    },
+    "tags": {},
     "iconsrc": "repl_read_top_row.svg"
 }
