@@ -23,7 +23,6 @@
     "config": {
         "$type": "http://sap.com/vflow/di_replication.repl_insert_test_tables.configSchema.json",
         "script": "file://repl_insert_test_tables.py",
-        "debug_mode": true,
         "num_inserts": 10,
         "max_random_num": 10000
     },

@@ -1,18 +1,15 @@
-import io
+
 
 import os
-import time
+import io
 import pandas as pd
 import logging
-
-
 
 import subprocess
 
 import sdi_utils.gensolution as gs
-import sdi_utils.set_logging as slog
 import sdi_utils.textfield_parser as tfp
-import sdi_utils.tprogress as tp
+
 
 try:
     api
@@ -39,17 +36,20 @@ except NameError:
             operator_name = 'repl_dispatch_tables'
             operator_description_long = "Send next table to process."
             add_readme = dict()
-            debug_mode = True
-            config_params['debug_mode'] = {'title': 'Debug mode',
-                                           'description': 'Sending debug level information to log port',
-                                           'type': 'boolean'}
 
             stop_no_changes = True
             config_params['stop_no_changes'] = {'title': 'Stops on no changes',
                                            'description': 'Stops when no changes.',
                                            'type': 'boolean'}
 
+        logger = logging.getLogger(name=config.operator_name)
 
+
+# catching logger messages for separate output
+log_stream = io.StringIO()
+sh = logging.StreamHandler(stream=log_stream)
+sh.setFormatter(logging.Formatter('%(asctime)s |  %(levelname)s | %(name)s | %(message)s', datefmt='%H:%M:%S'))
+api.logger.addHandler(sh)
 
 
 df_tables = pd.DataFrame()
@@ -83,24 +83,22 @@ def process(msg) :
 
     att['operator'] = 'repl_dispatch_tables'
 
-    logger, log_stream = slog.set_logging(att['operator'], loglevel=api.config.debug_mode)
-
     # case no repl tables provided
     if df_tables.empty :
-        logger.warning('No replication tables yet provided!')
+        api.logger.warning('No replication tables yet provided!')
         api.send(outports[0]['name'], log_stream.getvalue())
         return 0
 
     if att['data_outcome'] == True:
-        logger.debug('Reset \"number of changes\"-counter')
+        api.logger.debug('Reset \"number of changes\"-counter')
         no_changes_counter =  0
     else :
         no_changes_counter += 1
-        logger.debug('Changes counter: {}'.format(no_changes_counter))
+        api.logger.debug('Changes counter: {}'.format(no_changes_counter))
 
     # end pipeline if there were no changes in all tables
     if no_changes_counter >=  df_tables.shape[0] :
-        logger.info('Number of roundtrips without changes: {} - ending loop'.format(no_changes_counter))
+        api.logger.info('Number of roundtrips without changes: {} - ending loop'.format(no_changes_counter))
         api.send(outports[0]['name'], log_stream.getvalue())
         msg = api.Message(attributes=att, body=no_changes_counter)
         api.send(outports[2]['name'], msg)
@@ -119,7 +117,7 @@ def process(msg) :
     table_msg = api.Message(attributes= att, body = repl_table)
     api.send(outports[1]['name'], table_msg)
 
-    logger.info('Dispatch table: {}'.format(att['replication_table']))
+    api.logger.info('Dispatch table: {}'.format(att['replication_table']))
     api.send(outports[0]['name'], log_stream.getvalue())
 
     pointer = (pointer + 1) % df_tables.shape[0]

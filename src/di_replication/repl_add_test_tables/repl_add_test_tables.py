@@ -1,15 +1,11 @@
 import sdi_utils.gensolution as gs
-import sdi_utils.set_logging as slog
-import sdi_utils.textfield_parser as tfp
-import sdi_utils.tprogress as tp
 
 import subprocess
 import logging
 import os
-import random
+import io
 from datetime import datetime, timezone, timedelta
 import pandas as pd
-import numpy as np
 
 pd.set_option('mode.chained_assignment',None)
 
@@ -47,28 +43,28 @@ except NameError:
                                            'description': 'Sending debug level information to log port',
                                            'type': 'boolean'}
 
+        logger = logging.getLogger(name=config.operator_name)
+
+# catching logger messages for separate output
+log_stream = io.StringIO()
+sh = logging.StreamHandler(stream=log_stream)
+sh.setFormatter(logging.Formatter('%(asctime)s ;  %(levelname)s ; %(name)s ; %(message)s', datefmt='%H:%M:%S'))
+api.logger.addHandler(sh)
 
 def process(msg):
 
     att = dict(msg.attributes)
     att['operator'] = 'repl_add_test_tables'
-    logger, log_stream = slog.set_logging(att['operator'], loglevel=api.config.debug_mode)
 
-    logger.info("Process started. Logging level: {}".format(logger.level))
-    time_monitor = tp.progress()
+    api.logger.info("Process started. Logging level: {}".format(api.logger.level))
 
     now_str = datetime.now(timezone.utc).isoformat()
-    rec = [[att['table']['name'],'NUMBER',0,0,None,0,0,now_str]]
+    rec = [[att['table']['name'],'NUMBER',now_str]]
 
     att['table'] =  {"columns": [
         {"class": "string", "name": "TABLE_NAME", "nullable": False, "size": 100, "type": {"hana": "NVARCHAR"}},
         {"class": "string", "name": "CHECKSUM_COL", "nullable": True, "size": 100, "type": {"hana": "NVARCHAR"}},
-        {"class": "integer", "name": "FILE_CHECKSUM", "nullable": True, "type": {"hana": "BIGINT"}},
-        {"class": "integer", "name": "FILE_ROWS", "nullable": True, "type": {"hana": "BIGINT"}},
-        {"name": "FILE_UPDATED", "nullable": True, "type": {"hana": "LONGDATE"}},
-        {"class": "integer", "name": "TABLE_CHECKSUM", "nullable": True, "type": {"hana": "BIGINT"}},
-        {"class": "integer", "name": "TABLE_ROWS", "nullable": True, "type": {"hana": "BIGINT"}},
-        {"name": "TABLE_UPDATED", "nullable": True, "type": {"hana": "LONGDATE"}}],
+        {"name": "TABLE_UPDATED", "nullable": True, "type": {"hana": "TIMESTAMP"}}],
                "name": "REPLICATION.TABLE_REPOSITORY", "version": 1}
 
     api.send(outports[1]['name'], api.Message(attributes=att, body=rec))
@@ -76,7 +72,7 @@ def process(msg):
     log_stream.seek(0)
     log_stream.truncate()
 
-    logger.debug('Process ended: {}'.format(time_monitor.elapsed_time()))
+    api.logger.debug('Process ended')
     api.send(outports[0]['name'], log_stream.getvalue())
 
 
@@ -98,25 +94,21 @@ def test_operator():
 if __name__ == '__main__':
     test_operator()
     if True:
-        '''
-        print(os.getcwd())
-        subprocess.run(["rm", '-r','../../../solution/operators/sdi_replication_' + api.config.version])
-        gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-        solution_name = api.config.operator_name + '_' + api.config.version
-        subprocess.run(["vctl", "solution", "bundle",'../../../solution/operators/sdi_replication_' + api.config.version, \
-                        "-t", solution_name])
-        subprocess.run(["mv", solution_name + '.zip', '../../../solution/operators'])
-        '''
         basename = os.path.basename(__file__[:-3])
         package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
         project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-        solution_name = '{}_{}'.format(basename,api.config.version)
+        solution_name = '{}_{}.zip'.format(basename,api.config.version)
         package_name_ver = '{}_{}'.format(package_name,api.config.version)
-        solution_dir = os.path.join(project_dir,'solution/operators',package_name_ver)
-        solution_file = os.path.join(solution_dir,solution_name+'.zip')
 
-        subprocess.run(["rm", '-r',solution_file])
+        solution_dir = os.path.join(project_dir,'solution/operators',package_name_ver)
+        solution_file = os.path.join(project_dir,'solution/operators',solution_name)
+
+        # rm solution directory
+        subprocess.run(["rm", '-r',solution_dir])
+
+        # create solution directory with generated operator files
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
 
-        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t", solution_file])
-        subprocess.run(["mv", solution_file, os.path.join(project_dir,'solution/operators')])
+        # Bundle solution directory with generated operator files
+        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t",solution_file])
+

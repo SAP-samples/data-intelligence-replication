@@ -1,12 +1,10 @@
 import sdi_utils.gensolution as gs
-import sdi_utils.set_logging as slog
-import sdi_utils.textfield_parser as tfp
-import sdi_utils.tprogress as tp
-
-import subprocess
-import logging
 import os
-import random
+import subprocess
+
+import logging
+import io
+
 from datetime import datetime, timezone, timedelta
 import pandas as pd
 import numpy as np
@@ -35,18 +33,13 @@ except NameError:
             ## Meta data
             config_params = dict()
             version = '0.0.1'
-            tags = {'sdi_utils': ''}
+            tags = {}
             operator_name = 'repl_insert_test_tables'
             operator_description = "Insert Test Tables"
 
             operator_description_long = "Update test tables with incremental value."
             add_readme = dict()
             add_readme["References"] = ""
-
-            debug_mode = True
-            config_params['debug_mode'] = {'title': 'Debug mode',
-                                           'description': 'Sending debug level information to log port',
-                                           'type': 'boolean'}
 
             num_inserts = 10
             config_params['num_inserts'] = {'title': 'Number of inserts',
@@ -59,11 +52,18 @@ except NameError:
                                            'description': 'Maximum random number.',
                                            'type': 'integer'}
 
+        logger = logging.getLogger(name=config.operator_name)
+
+# catching logger messages for separate output
+log_stream = io.StringIO()
+sh = logging.StreamHandler(stream=log_stream)
+sh.setFormatter(logging.Formatter('%(asctime)s |  %(levelname)s | %(name)s | %(message)s', datefmt='%H:%M:%S'))
+api.logger.addHandler(sh)
+
 def process(msg):
 
     att = dict(msg.attributes)
     operator_name = 'repl_insert_test_tables'
-    logger, log_stream = slog.set_logging(operator_name, loglevel=api.config.debug_mode)
 
     max_index = msg.body[0][0]
     if max_index == None :
@@ -77,7 +77,7 @@ def process(msg):
     df['DIREPL_UPDATED'] = datetime.now(timezone.utc).isoformat()
     df['DIREPL_PID'] = 0
     df['DIREPL_STATUS'] = 'W'
-    df['DIREPL_PACKAGEID'] = 0
+    #df['DIREPL_PACKAGEID'] = 0
     df['DIREPL_TYPE'] = 'I'
     df['DATETIME'] =  datetime.now(timezone.utc) - pd.to_timedelta(1,unit='d')
     df['DATETIME'] = df['DATETIME'].apply(datetime.isoformat)
@@ -88,13 +88,14 @@ def process(msg):
         "columns": [{"class": "integer", "name": "INDEX", "nullable": False, "type": {"hana": "BIGINT"}}, \
                     {"class": "integer", "name": "NUMBER", "nullable": True, "type": {"hana": "BIGINT"}}, \
                     {"class": "datetime", "name": "DATETIME", "nullable": True, "type": {"hana": "TIMESTAMP"}}, \
-                    {"class": "integer", "name": "DIREPL_PACKAGEID", "nullable": False, "type": {"hana": "BIGINT"}}, \
+                    #{"class": "integer", "name": "DIREPL_PACKAGEID", "nullable": False, "type": {"hana": "BIGINT"}}, \
                     {"class": "integer", "name": "DIREPL_PID", "nullable": True, "type": {"hana": "BIGINT"}}, \
                     {"class": "datetime", "name": "DIREPL_UPDATED", "nullable": True,"type": {"hana": "TIMESTAMP"}}, \
                     {"class": "string", "name": "DIREPL_STATUS", "nullable": True, "size": 1,"type": {"hana": "NVARCHAR"}}, \
                     {"class": "string", "name": "DIREPL_TYPE", "nullable": True, "size": 1,
                      "type": {"hana": "NVARCHAR"}}],"version": 1, "name": att['replication_table']}
-    df = df[['INDEX','NUMBER','DATETIME','DIREPL_PACKAGEID','DIREPL_PID','DIREPL_UPDATED','DIREPL_STATUS','DIREPL_TYPE']]
+    #df = df[['INDEX','NUMBER','DATETIME','DIREPL_PACKAGEID','DIREPL_PID','DIREPL_UPDATED','DIREPL_STATUS','DIREPL_TYPE']]
+    df = df[['INDEX', 'NUMBER', 'DATETIME','DIREPL_PID', 'DIREPL_UPDATED', 'DIREPL_STATUS','DIREPL_TYPE']]
 
     table_data = df.values.tolist()
 
@@ -129,15 +130,18 @@ if __name__ == '__main__':
         basename = os.path.basename(__file__[:-3])
         package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
         project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-        solution_name = '{}_{}'.format(basename,api.config.version)
+        solution_name = '{}_{}.zip'.format(basename,api.config.version)
         package_name_ver = '{}_{}'.format(package_name,api.config.version)
-        solution_dir = os.path.join(project_dir,'solution/operators',package_name_ver)
-        solution_file = os.path.join(solution_dir,solution_name+'.zip')
 
-        subprocess.run(["rm", '-r',solution_file])
+        solution_dir = os.path.join(project_dir,'solution/operators',package_name_ver)
+        solution_file = os.path.join(project_dir,'solution/operators',solution_name)
+
+        # rm solution directory
+        subprocess.run(["rm", '-r',solution_dir])
+
+        # create solution directory with generated operator files
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
 
-        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t", solution_file])
-        subprocess.run(["mv", solution_file, os.path.join(project_dir,'solution/operators')])
-        logging.info(f"Solution created: {solution_file}")
+        # Bundle solution directory with generated operator files
+        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t",solution_file])
 

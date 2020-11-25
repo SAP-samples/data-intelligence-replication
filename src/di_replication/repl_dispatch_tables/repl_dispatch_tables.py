@@ -1,18 +1,13 @@
-import io
+
 
 import os
-import time
+import io
 import pandas as pd
 import logging
-
-
 
 import subprocess
 
 import sdi_utils.gensolution as gs
-import sdi_utils.set_logging as slog
-import sdi_utils.textfield_parser as tfp
-import sdi_utils.tprogress as tp
 
 try:
     api
@@ -32,24 +27,27 @@ except NameError:
         class config:
             ## Meta data
             config_params = dict()
-            tags = {'sdi_utils':'', 'pandas':''}
+            tags = {'pandas':''}
             version = "0.1.0"
 
             operator_description = "Dispatch Tables"
             operator_name = 'repl_dispatch_tables'
             operator_description_long = "Send next table to process."
             add_readme = dict()
-            debug_mode = True
-            config_params['debug_mode'] = {'title': 'Debug mode',
-                                           'description': 'Sending debug level information to log port',
-                                           'type': 'boolean'}
 
             stop_no_changes = True
             config_params['stop_no_changes'] = {'title': 'Stops on no changes',
                                            'description': 'Stops when no changes.',
                                            'type': 'boolean'}
 
+        logger = logging.getLogger(name=config.operator_name)
 
+
+# catching logger messages for separate output
+log_stream = io.StringIO()
+sh = logging.StreamHandler(stream=log_stream)
+sh.setFormatter(logging.Formatter('%(asctime)s |  %(levelname)s | %(name)s | %(message)s', datefmt='%H:%M:%S'))
+api.logger.addHandler(sh)
 
 
 df_tables = pd.DataFrame()
@@ -83,24 +81,22 @@ def process(msg) :
 
     att['operator'] = 'repl_dispatch_tables'
 
-    logger, log_stream = slog.set_logging(att['operator'], loglevel=api.config.debug_mode)
-
     # case no repl tables provided
     if df_tables.empty :
-        logger.warning('No replication tables yet provided!')
+        api.logger.warning('No replication tables yet provided!')
         api.send(outports[0]['name'], log_stream.getvalue())
         return 0
 
     if att['data_outcome'] == True:
-        logger.debug('Reset \"number of changes\"-counter')
+        api.logger.debug('Reset \"number of changes\"-counter')
         no_changes_counter =  0
     else :
         no_changes_counter += 1
-        logger.debug('Changes counter: {}'.format(no_changes_counter))
+        api.logger.debug('Changes counter: {}'.format(no_changes_counter))
 
     # end pipeline if there were no changes in all tables
     if no_changes_counter >=  df_tables.shape[0] :
-        logger.info('Number of roundtrips without changes: {} - ending loop'.format(no_changes_counter))
+        api.logger.info('Number of roundtrips without changes: {} - ending loop'.format(no_changes_counter))
         api.send(outports[0]['name'], log_stream.getvalue())
         msg = api.Message(attributes=att, body=no_changes_counter)
         api.send(outports[2]['name'], msg)
@@ -119,7 +115,7 @@ def process(msg) :
     table_msg = api.Message(attributes= att, body = repl_table)
     api.send(outports[1]['name'], table_msg)
 
-    logger.info('Dispatch table: {}'.format(att['replication_table']))
+    api.logger.info('Dispatch table: {}'.format(att['replication_table']))
     api.send(outports[0]['name'], log_stream.getvalue())
 
     pointer = (pointer + 1) % df_tables.shape[0]
@@ -170,16 +166,19 @@ if __name__ == '__main__':
         basename = os.path.basename(__file__[:-3])
         package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
         project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-        solution_name = '{}_{}'.format(basename,api.config.version)
+        solution_name = '{}_{}.zip'.format(basename,api.config.version)
         package_name_ver = '{}_{}'.format(package_name,api.config.version)
-        solution_dir = os.path.join(project_dir,'solution/operators',package_name_ver)
-        solution_file = os.path.join(solution_dir,solution_name+'.zip')
 
-        subprocess.run(["rm", '-r',solution_file])
+        solution_dir = os.path.join(project_dir,'solution/operators',package_name_ver)
+        solution_file = os.path.join(project_dir,'solution/operators',solution_name)
+
+        # rm solution directory
+        subprocess.run(["rm", '-r',solution_dir])
+
+        # create solution directory with generated operator files
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
 
-        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t", solution_file])
-        subprocess.run(["mv", solution_file, os.path.join(project_dir,'solution/operators')])
-        logging.info(f"Solution created: {solution_file}")
+        # Bundle solution directory with generated operator files
+        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t",solution_file])
 
 

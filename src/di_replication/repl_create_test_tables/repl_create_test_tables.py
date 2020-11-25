@@ -1,11 +1,10 @@
 import sdi_utils.gensolution as gs
-import sdi_utils.set_logging as slog
 import sdi_utils.textfield_parser as tfp
-import sdi_utils.tprogress as tp
 
 import subprocess
 import logging
 import os
+import io
 import random
 from datetime import datetime, timezone, timedelta
 import pandas as pd
@@ -58,14 +57,20 @@ except NameError:
                                            'description': 'Base Table Name.',
                                            'type': 'string'}
 
+        logger = logging.getLogger(name=config.operator_name)
 
-def process(msg):
+# catching logger messages for separate output
+log_stream = io.StringIO()
+sh = logging.StreamHandler(stream=log_stream)
+sh.setFormatter(logging.Formatter('%(asctime)s ;  %(levelname)s ; %(name)s ; %(message)s', datefmt='%H:%M:%S'))
+api.logger.addHandler(sh)
+
+def process():
 
     operator_name = 'repl_create_test_tables'
-    logger, log_stream = slog.set_logging(operator_name, loglevel=api.config.debug_mode)
+    #logger, log_stream = slog.set_logging(operator_name, loglevel=api.config.debug_mode)
 
-    logger.info("Process started. Logging level: {}".format(logger.level))
-    time_monitor = tp.progress()
+    api.logger.info("Process started. Logging level: {}".format(api.logger.level))
 
     for i in range (0,api.config.num_tables) :
 
@@ -75,7 +80,7 @@ def process(msg):
         ### DROP
 
         att_drop = {'table':{'name':table_name},'message.batchIndex':i,'message.lastBatch':lastbatch,'sql':'DROP'}
-        logger.info("Drop table:")
+        api.logger.info("Drop table:")
         drop_sql = "DROP TABLE {table}".format(table = table_name)
         api.send(outports[1]['name'], api.Message(attributes=att_drop, body=drop_sql))
         api.send(outports[0]['name'], log_stream.getvalue())
@@ -84,10 +89,10 @@ def process(msg):
 
         ### CREATE
 
-        logger.info('Create Table: ')
+        api.logger.info('Create Table: ')
 
-        create_sql = "CREATE COLUMN TABLE {table} (\"INDEX\" BIGINT , \"NUMBER\" BIGINT,  \"DATETIME\" TIMESTAMP,"\
-                     "\"DIREPL_PACKAGEID\" BIGINT, \"DIREPL_PID\" BIGINT , \"DIREPL_UPDATED\" LONGDATE, " \
+        create_sql = "CREATE COLUMN TABLE {table} (\"INDEX\" BIGINT , \"NUMBER\" BIGINT,  \"DATETIME\" TIMESTAMP,\
+         \"DIREPL_PID\" BIGINT , \"DIREPL_UPDATED\" LONGDATE, " \
                      "\"DIREPL_STATUS\" NVARCHAR(1), \"DIREPL_TYPE\" NVARCHAR(1), " \
                      "PRIMARY KEY (\"INDEX\"));".format(table = table_name )
 
@@ -97,7 +102,7 @@ def process(msg):
         log_stream.seek(0)
         log_stream.truncate()
 
-    logger.debug('Process ended: {}'.format(time_monitor.elapsed_time()))
+    api.logger.debug('Process ended')
     api.send(outports[0]['name'], log_stream.getvalue())
 
 
@@ -105,7 +110,7 @@ inports = [{'name': 'data', 'type': 'message.table', "description": "Input data"
 outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
             {'name': 'sql', 'type': 'message', "description": "msg with sql"}]
 
-#api.set_port_callback(inports[0]['name'], process)
+#api.add_generator( process)
 
 def test_operator():
     api.config.off_set = 2

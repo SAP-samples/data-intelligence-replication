@@ -9,11 +9,6 @@
         "script": {
             "type": "string"
         },
-        "debug_mode": {
-            "title": "Debug mode",
-            "description": "Sending debug level information to log port",
-            "type": "boolean"
-        },
         "num_inserts": {
             "title": "Number of inserts",
             "description": "Number of inserts.",

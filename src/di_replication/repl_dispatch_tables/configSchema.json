@@ -9,11 +9,6 @@
         "script": {
             "type": "string"
         },
-        "debug_mode": {
-            "title": "Debug mode",
-            "description": "Sending debug level information to log port",
-            "type": "boolean"
-        },
         "stop_no_changes": {
             "title": "Stops on no changes",
             "description": "Stops when no changes.",

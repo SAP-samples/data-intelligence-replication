@@ -1,12 +1,10 @@
 import sdi_utils.gensolution as gs
-import sdi_utils.set_logging as slog
-import sdi_utils.textfield_parser as tfp
-import sdi_utils.tprogress as tp
-
-import subprocess
-import logging
 import os
-import random
+import subprocess
+
+import logging
+import io
+
 from datetime import datetime, timezone, timedelta
 import pandas as pd
 import numpy as np
@@ -43,11 +41,6 @@ except NameError:
             add_readme = dict()
             add_readme["References"] = ""
 
-            debug_mode = True
-            config_params['debug_mode'] = {'title': 'Debug mode',
-                                           'description': 'Sending debug level information to log port',
-                                           'type': 'boolean'}
-
             num_inserts = 10
             config_params['num_inserts'] = {'title': 'Number of inserts',
                                            'description': 'Number of inserts.',
@@ -59,11 +52,18 @@ except NameError:
                                            'description': 'Maximum random number.',
                                            'type': 'integer'}
 
+        logger = logging.getLogger(name=config.operator_name)
+
+# catching logger messages for separate output
+log_stream = io.StringIO()
+sh = logging.StreamHandler(stream=log_stream)
+sh.setFormatter(logging.Formatter('%(asctime)s |  %(levelname)s | %(name)s | %(message)s', datefmt='%H:%M:%S'))
+api.logger.addHandler(sh)
+
 def process(msg):
 
     att = dict(msg.attributes)
     operator_name = 'repl_insert_test_tables'
-    logger, log_stream = slog.set_logging(operator_name, loglevel=api.config.debug_mode)
 
     max_index = msg.body[0][0]
     if max_index == None :

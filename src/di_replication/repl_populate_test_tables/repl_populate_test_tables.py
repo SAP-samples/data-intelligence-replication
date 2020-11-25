@@ -1,12 +1,12 @@
 import sdi_utils.gensolution as gs
-import sdi_utils.set_logging as slog
+#import sdi_utils.set_logging as slog
 import sdi_utils.textfield_parser as tfp
-import sdi_utils.tprogress as tp
 
 import subprocess
 import logging
 import os
-import random
+import io
+
 from datetime import datetime, timezone, timedelta
 import pandas as pd
 import numpy as np
@@ -56,20 +56,26 @@ except NameError:
             config_params['package_size'] = {'title': 'Package size',
                                            'description': 'Package size',
                                            'type': 'integer'}
+        logger = logging.getLogger(name=config.operator_name)
 
+
+# catching logger messages for separate output
+log_stream = io.StringIO()
+sh = logging.StreamHandler(stream=log_stream)
+sh.setFormatter(logging.Formatter('%(asctime)s ;  %(levelname)s ; %(name)s ; %(message)s', datefmt='%H:%M:%S'))
+api.logger.addHandler(sh)
 
 def process(msg):
     att = dict(msg.attributes)
     att['operator'] = 'repl_populate_test_tables'
-    logger, log_stream = slog.set_logging(att['operator'], loglevel=api.config.debug_mode)
+    #api.logger, log_stream = slog.set_logging(att['operator'], loglevel=api.config.debug_mode)
 
-    logger.info("Process started. Logging level: {}".format(logger.level))
-    time_monitor = tp.progress()
-    logger.debug('Attributes: {}'.format(str(att)))
+    api.logger.info("Process started. Logging level: {}".format(api.logger.level))
+    api.logger.debug('Attributes: {}'.format(str(att)))
 
     # No further processing
     if att['sql'] == 'DROP':
-        logger.info('Drop message - return 0')
+        api.logger.info('Drop message - return 0')
         return 0
 
     offset = att['message.batchIndex']
@@ -79,7 +85,7 @@ def process(msg):
     df['DIREPL_UPDATED'] = datetime.now(timezone.utc).isoformat()
     df['DIREPL_PID'] = 0
     df['DIREPL_STATUS'] = 'W'
-    df['DIREPL_PACKAGEID'] = 0
+    #df['DIREPL_PACKAGEID'] = 0
     df['DIREPL_TYPE'] = 'I'
     df['NUM_MOD'] = df['NUMBER']%100
     df['DATETIME'] = datetime.now(timezone.utc) - pd.to_timedelta(df['NUM_MOD'],unit='d')
@@ -92,19 +98,16 @@ def process(msg):
     #df['DATE'] = df['INDEX'].apply(lambda x : (first_date + timedelta(days = int(x/days_step))).strftime('%Y-%m-%d'))
     #df['DATE'] = df['INDEX'].apply(lambda x: (first_date + timedelta(days=int(x / days_step))).isoformat())
 
-    packageid_start = 0
-    for i, start in enumerate(range(0, df.shape[0], api.config.package_size)):
-        df.DIREPL_PACKAGEID.iloc[start:start + api.config.package_size] = packageid_start + i
-
-    logger.info('Create Table offset: {}'.format(i))
-    # csv = df.to_csv(sep=',', index=False)
+    #packageid_start = 0
+    #for i, start in enumerate(range(0, df.shape[0], api.config.package_size)):
+    #    df.DIREPL_PACKAGEID.iloc[start:start + api.config.package_size] = packageid_start + i
 
     # ensure the sequence of the table corresponds to attribute table:columns
     att['table'] = {
         "columns": [{"class": "integer", "name": "INDEX", "nullable": False, "type": {"hana": "BIGINT"}}, \
                     {"class": "integer", "name": "NUMBER", "nullable": True, "type": {"hana": "BIGINT"}},
                     {"class": "timestamp", "name": "DATETIME", "nullable": False, "type": {"hana": "TIMESTAMP"}}, \
-                    {"class": "integer", "name": "DIREPL_PACKAGEID", "nullable": False, "type": {"hana": "BIGINT"}}, \
+                    #{"class": "integer", "name": "DIREPL_PACKAGEID", "nullable": False, "type": {"hana": "BIGINT"}}, \
                     {"class": "integer", "name": "DIREPL_PID", "nullable": True, "type": {"hana": "BIGINT"}}, \
                     {"class": "timestamp", "name": "DIREPL_UPDATED", "nullable": True, "type": {"hana": "TIMESTAMP"}}, \
                     {"class": "string", "name": "DIREPL_STATUS", "nullable": True, "size": 1, "type": {"hana": "NVARCHAR"}}, \
@@ -112,12 +115,13 @@ def process(msg):
                     "version": 1, "name": att['table_name']}
 
 
-    df = df[['INDEX','NUMBER','DATETIME','DIREPL_PACKAGEID','DIREPL_PID','DIREPL_UPDATED','DIREPL_STATUS','DIREPL_TYPE']]
+    #df = df[['INDEX','NUMBER','DATETIME','DIREPL_PACKAGEID','DIREPL_PID','DIREPL_UPDATED','DIREPL_STATUS','DIREPL_TYPE']]
+    df = df[['INDEX', 'NUMBER', 'DATETIME','DIREPL_PID', 'DIREPL_UPDATED', 'DIREPL_STATUS','DIREPL_TYPE']]
     table_data = df.values.tolist()
 
     api.send(outports[1]['name'], api.Message(attributes=att, body=table_data))
 
-    logger.debug('Process ended: {}'.format(time_monitor.elapsed_time()))
+    api.logger.debug('Process ended: {}')
     api.send(outports[0]['name'], log_stream.getvalue())
 
 
