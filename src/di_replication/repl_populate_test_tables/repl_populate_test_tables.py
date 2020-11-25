@@ -76,21 +76,21 @@ def process(msg):
     col1 = np.arange(offset, api.config.num_rows+offset)
     df = pd.DataFrame(col1, columns=['NUMBER']).reset_index()
     df.rename(columns={'index': 'INDEX'}, inplace=True)
-    #df['DATE'] = datetime.today()
-    df['DIREPL_UPDATED'] = 0
+    df['DIREPL_UPDATED'] = datetime.now(timezone.utc).isoformat()
     df['DIREPL_PID'] = 0
     df['DIREPL_STATUS'] = 'W'
     df['DIREPL_PACKAGEID'] = 0
     df['DIREPL_TYPE'] = 'I'
-    df['DIREPL_UPDATED'] = df['DIREPL_UPDATED'].apply(lambda x: datetime.now(timezone.utc).isoformat())
+    df['NUM_MOD'] = df['NUMBER']%100
+    df['DATETIME'] = datetime.now(timezone.utc) - pd.to_timedelta(df['NUM_MOD'],unit='d')
+    df['DATETIME'] = df['DATETIME'].apply(datetime.isoformat)
 
-    days_into_past = api.config.num_rows if api.config.num_rows < 3650 else 3650
-    days_step =  1 if int(api.config.num_rows/days_into_past) == 0 else int(api.config.num_rows/days_into_past)
-    first_date  = datetime.now(timezone.utc) - timedelta(days = days_into_past)
+
+    #days_into_past = api.config.num_rows if api.config.num_rows < 3650 else 3650
+    #days_step =  1 if int(api.config.num_rows/days_into_past) == 0 else int(api.config.num_rows/days_into_past)
+    #first_date  = datetime.now(timezone.utc) - timedelta(days = days_into_past)
     #df['DATE'] = df['INDEX'].apply(lambda x : (first_date + timedelta(days = int(x/days_step))).strftime('%Y-%m-%d'))
-    df['DATE'] = df['INDEX'].apply(lambda x: (first_date + timedelta(days=int(x / days_step))).isoformat())
-
-    print(df)
+    #df['DATE'] = df['INDEX'].apply(lambda x: (first_date + timedelta(days=int(x / days_step))).isoformat())
 
     packageid_start = 0
     for i, start in enumerate(range(0, df.shape[0], api.config.package_size)):
@@ -103,7 +103,7 @@ def process(msg):
     att['table'] = {
         "columns": [{"class": "integer", "name": "INDEX", "nullable": False, "type": {"hana": "BIGINT"}}, \
                     {"class": "integer", "name": "NUMBER", "nullable": True, "type": {"hana": "BIGINT"}},
-                    {"class": "date", "name": "DATE", "nullable": False, "type": {"hana": "DATE"}}, \
+                    {"class": "timestamp", "name": "DATETIME", "nullable": False, "type": {"hana": "TIMESTAMP"}}, \
                     {"class": "integer", "name": "DIREPL_PACKAGEID", "nullable": False, "type": {"hana": "BIGINT"}}, \
                     {"class": "integer", "name": "DIREPL_PID", "nullable": True, "type": {"hana": "BIGINT"}}, \
                     {"class": "timestamp", "name": "DIREPL_UPDATED", "nullable": True, "type": {"hana": "TIMESTAMP"}}, \
@@ -112,7 +112,7 @@ def process(msg):
                     "version": 1, "name": att['table_name']}
 
 
-    df = df[['INDEX','NUMBER','DATE','DIREPL_PACKAGEID','DIREPL_PID','DIREPL_UPDATED','DIREPL_STATUS','DIREPL_TYPE']]
+    df = df[['INDEX','NUMBER','DATETIME','DIREPL_PACKAGEID','DIREPL_PID','DIREPL_UPDATED','DIREPL_STATUS','DIREPL_TYPE']]
     table_data = df.values.tolist()
 
     api.send(outports[1]['name'], api.Message(attributes=att, body=table_data))
@@ -156,11 +156,18 @@ def test_operator():
 if __name__ == '__main__':
     test_operator()
     if True:
-        print(os.getcwd())
-        subprocess.run(["rm", '-r','../../../solution/operators/sdi_replication_' + api.config.version])
+        basename = os.path.basename(__file__[:-3])
+        package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
+        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        solution_name = '{}_{}'.format(basename,api.config.version)
+        package_name_ver = '{}_{}'.format(package_name,api.config.version)
+        solution_dir = os.path.join(project_dir,'solution/operators',package_name_ver)
+        solution_file = os.path.join(solution_dir,solution_name+'.zip')
+
+        subprocess.run(["rm", '-r',solution_file])
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-        solution_name = api.config.operator_name + '_' + api.config.version
-        subprocess.run(["vctl", "solution", "bundle",'../../../solution/operators/sdi_replication_' + api.config.version, \
-                        "-t", solution_name])
-        subprocess.run(["mv", solution_name + '.zip', '../../../solution/operators'])
+
+        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t", solution_file])
+        subprocess.run(["mv", solution_file, os.path.join(project_dir,'solution/operators')])
+        logging.info(f"Solution created: {solution_file}")
 

@@ -3,6 +3,7 @@ import io
 import os
 import time
 import pandas as pd
+import logging
 
 
 import subprocess
@@ -54,7 +55,7 @@ def process(msg) :
 
     header = [c["name"] for c in msg.attributes['table']['columns']]
     df = pd.DataFrame(msg.body,columns=header)
-    repl_tables = df['TABLE'].values
+    repl_tables = df['TABLE_NAME'].values
 
     # case no repl tables provided
     if len(repl_tables) == 0 :
@@ -102,7 +103,7 @@ def test_operator() :
 
     api.config.debug_mode = True
 
-    att = {"table":{"columns":[{"class":"string","name":"TABLE","nullable":False,"size":100,"type":{"hana":"NVARCHAR"}},\
+    att = {"table":{"columns":[{"class":"string","name":"TABLE_NAME","nullable":False,"size":100,"type":{"hana":"NVARCHAR"}},\
                                {"class":"integer","name":"LATENCY","nullable":True,"type":{"hana":"INTEGER"}}],"version":1}}
 
     data = [["REPLICATION.DOC_METADATA_REPL",0],["REPLICATION.TEXT_WORDS_REPL",2],["REPLICATION.WORD_INDEX_REPL",1],["REPLICATION.WORD_SENTIMENT_REPL",5]]
@@ -121,12 +122,20 @@ def test_operator() :
 if __name__ == '__main__':
     test_operator()
     if True:
-        subprocess.run(["rm", '-r','../../../solution/operators/sdi_replication_' + api.config.version])
+        basename = os.path.basename(__file__[:-3])
+        package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
+        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        solution_name = '{}_{}'.format(basename,api.config.version)
+        package_name_ver = '{}_{}'.format(package_name,api.config.version)
+        solution_dir = os.path.join(project_dir,'solution/operators',package_name_ver)
+        solution_file = os.path.join(solution_dir,solution_name+'.zip')
+
+        subprocess.run(["rm", '-r',solution_file])
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-        solution_name = api.config.operator_name + '_' + api.config.version
-        subprocess.run(["vctl", "solution", "bundle",'../../../solution/operators/sdi_replication_' + api.config.version, \
-                        "-t", solution_name])
-        subprocess.run(["mv", solution_name + '.zip', '../../../solution/operators'])
+
+        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t", solution_file])
+        subprocess.run(["mv", solution_file, os.path.join(project_dir,'solution/operators')])
+        logging.info(f"Solution created: {solution_file}")
 
 
 

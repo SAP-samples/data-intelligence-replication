@@ -70,7 +70,7 @@ def process(msg):
     offset = random.randint(0,modulo_factor-1)
 
     sql = 'UPDATE {table} SET \"NUMBER\" = floor(RAND() * {maxn}), \"DIREPL_TYPE\" = \'U\', \"DIREPL_STATUS\" =  \'W\', '  \
-          ' \"DIREPL_UPDATED\" = CURRENT_UTCTIMESTAMP WHERE MOD(\"INDEX\",{mf}) = {of}' \
+          ' \"DIREPL_UPDATED\" = CURRENT_UTCTIMESTAMP WHERE MOD(\"INDEX\",{mf}) = {of}'  \
         .format(table = att['replication_table'],maxn = maxn, mf= modulo_factor,of= offset)
 
     logger.info('SQL statement: {}'.format(sql))

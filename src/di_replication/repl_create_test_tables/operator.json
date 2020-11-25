@@ -21,7 +21,7 @@
         }
     ],
     "config": {
-        "$type": "http://sap.com/vflow/sdi_replication.repl_create_test_tables.configSchema.json",
+        "$type": "http://sap.com/vflow/di_replication.repl_create_test_tables.configSchema.json",
         "script": "file://repl_create_test_tables.py",
         "debug_mode": true,
         "num_tables": 10,

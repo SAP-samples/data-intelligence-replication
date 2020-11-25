@@ -43,6 +43,12 @@ except NameError:
                                            'description': 'Sending debug level information to log port',
                                            'type': 'boolean'}
 
+            package_size = False
+            config_params['package_size'] = {'title': 'Package size',
+                                           'description': 'Defining the package size that should be picked for replication. '
+                                            'This is not used together with \'Pacakge ID\'',
+                                           'type': 'integer'}
+
             use_package_id = False
             config_params['use_package_id'] = {'title': 'Using Package ID',
                                            'description': 'Using Package ID rather than generated packages by package size',
@@ -94,6 +100,9 @@ def process(msg):
                      '\"DIREPL_PACKAGEID\" = (SELECT min(\"DIREPL_PACKAGEID\") ' \
                      'FROM {table} WHERE  {ws}) AND {ws}' \
             .format(table=table, pid = att['pid'],ws = wheresnippet)
+    elif api.config.package_size > 0 :
+        sql = 'UPDATE TOP {packagesize} {table} SET \"DIREPL_STATUS\" = \'B\', \"DIREPL_PID\" = \'{pid}\' WHERE  {ws}' \
+            .format(packagesize=api.config.package_size,table=table, pid=att['pid'], ws=wheresnippet)
     else :
         sql = 'UPDATE {table} SET \"DIREPL_STATUS\" = \'B\', \"DIREPL_PID\" = \'{pid}\' WHERE  {ws}' \
             .format(table=table, pid = att['pid'],ws = wheresnippet)
@@ -116,7 +125,7 @@ outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
 #api.set_port_callback(inports[0]['name'], process)
 
 def test_operator():
-
+    #api.config.package_size = 100
     msg = api.Message(attributes={'packageid':4711,'table_name':'repl_table','schema_name':'schema',\
                                   'data_outcome':True},body='')
     process(msg)
@@ -129,10 +138,18 @@ def test_operator():
 if __name__ == '__main__':
     test_operator()
     if True:
-        subprocess.run(["rm", '-r','../../../solution/operators/sdi_replication_' + api.config.version])
+        basename = os.path.basename(__file__[:-3])
+        package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
+        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        solution_name = '{}_{}'.format(basename,api.config.version)
+        package_name_ver = '{}_{}'.format(package_name,api.config.version)
+        solution_dir = os.path.join(project_dir,'solution/operators',package_name_ver)
+        solution_file = os.path.join(solution_dir,solution_name+'.zip')
+
+        subprocess.run(["rm", '-r',solution_file])
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-        solution_name = api.config.operator_name + '_' + api.config.version
-        subprocess.run(["vctl", "solution", "bundle",'../../../solution/operators/sdi_replication_' + api.config.version, \
-                        "-t", solution_name])
-        subprocess.run(["mv", solution_name + '.zip', '../../../solution/operators'])
+
+        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t", solution_file])
+        subprocess.run(["mv", solution_file, os.path.join(project_dir,'solution/operators')])
+        logging.info(f"Solution created: {solution_file}")
 

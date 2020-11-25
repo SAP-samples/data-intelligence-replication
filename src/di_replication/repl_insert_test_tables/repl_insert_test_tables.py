@@ -66,32 +66,35 @@ def process(msg):
     logger, log_stream = slog.set_logging(operator_name, loglevel=api.config.debug_mode)
 
     max_index = msg.body[0][0]
+    if max_index == None :
+        max_index = 0
     num_inserts = api.config.num_inserts
     maxn = api.config.max_random_num
 
     col1 = np.arange(max_index+1, max_index + num_inserts+1)
     df = pd.DataFrame(col1, columns=['INDEX']).reset_index()
     df['NUMBER'] = np.random.randint(0, maxn, num_inserts)
-    df['DIREPL_UPDATED'] = 0
-    df['DIREPL_UPDATED'] = df['DIREPL_UPDATED'].apply(lambda x: datetime.now(timezone.utc).isoformat())
+    df['DIREPL_UPDATED'] = datetime.now(timezone.utc).isoformat()
     df['DIREPL_PID'] = 0
     df['DIREPL_STATUS'] = 'W'
     df['DIREPL_PACKAGEID'] = 0
     df['DIREPL_TYPE'] = 'I'
+    df['DATETIME'] =  datetime.now(timezone.utc) - pd.to_timedelta(1,unit='d')
+    df['DATETIME'] = df['DATETIME'].apply(datetime.isoformat)
+    #df['DATE'] = df['DATE'].dt.strftime("%Y-%m-%d")
 
     table_name = att['replication_table']
     att['table'] = {
         "columns": [{"class": "integer", "name": "INDEX", "nullable": False, "type": {"hana": "BIGINT"}}, \
                     {"class": "integer", "name": "NUMBER", "nullable": True, "type": {"hana": "BIGINT"}}, \
+                    {"class": "datetime", "name": "DATETIME", "nullable": True, "type": {"hana": "TIMESTAMP"}}, \
                     {"class": "integer", "name": "DIREPL_PACKAGEID", "nullable": False, "type": {"hana": "BIGINT"}}, \
                     {"class": "integer", "name": "DIREPL_PID", "nullable": True, "type": {"hana": "BIGINT"}}, \
-                    {"class": "timestamp", "name": "DIREPL_UPDATED", "nullable": True,
-                     "type": {"hana": "TIMESTAMP"}}, \
-                    {"class": "string", "name": "DIREPL_STATUS", "nullable": True, "size": 1,
-                     "type": {"hana": "NVARCHAR"}}, \
+                    {"class": "datetime", "name": "DIREPL_UPDATED", "nullable": True,"type": {"hana": "TIMESTAMP"}}, \
+                    {"class": "string", "name": "DIREPL_STATUS", "nullable": True, "size": 1,"type": {"hana": "NVARCHAR"}}, \
                     {"class": "string", "name": "DIREPL_TYPE", "nullable": True, "size": 1,
                      "type": {"hana": "NVARCHAR"}}],"version": 1, "name": att['replication_table']}
-    df = df[['INDEX','NUMBER','DIREPL_PACKAGEID','DIREPL_PID','DIREPL_UPDATED','DIREPL_STATUS','DIREPL_TYPE']]
+    df = df[['INDEX','NUMBER','DATETIME','DIREPL_PACKAGEID','DIREPL_PID','DIREPL_UPDATED','DIREPL_STATUS','DIREPL_TYPE']]
 
     table_data = df.values.tolist()
 
@@ -123,11 +126,18 @@ def test_operator():
 if __name__ == '__main__':
     test_operator()
     if True:
-        print(os.getcwd())
-        subprocess.run(["rm", '-r','../../../solution/operators/sdi_replication_' + api.config.version])
+        basename = os.path.basename(__file__[:-3])
+        package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
+        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        solution_name = '{}_{}'.format(basename,api.config.version)
+        package_name_ver = '{}_{}'.format(package_name,api.config.version)
+        solution_dir = os.path.join(project_dir,'solution/operators',package_name_ver)
+        solution_file = os.path.join(solution_dir,solution_name+'.zip')
+
+        subprocess.run(["rm", '-r',solution_file])
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-        solution_name = api.config.operator_name + '_' + api.config.version
-        subprocess.run(["vctl", "solution", "bundle",'../../../solution/operators/sdi_replication_' + api.config.version, \
-                        "-t", solution_name])
-        subprocess.run(["mv", solution_name + '.zip', '../../../solution/operators'])
+
+        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t", solution_file])
+        subprocess.run(["mv", solution_file, os.path.join(project_dir,'solution/operators')])
+        logging.info(f"Solution created: {solution_file}")
 

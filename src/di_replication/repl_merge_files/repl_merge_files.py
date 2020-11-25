@@ -3,6 +3,7 @@ import subprocess
 import os
 import pandas as pd
 import io
+import logging
 
 import sdi_utils.gensolution as gs
 import sdi_utils.set_logging as slog
@@ -98,7 +99,7 @@ def process(msg):
 
             table = att['current_file']['schema_name'] + '.' +  att['current_file']['table_name']
             sql = 'UPDATE {repos_table} SET \"FILE_CHECKSUM\" = {cs}, \"FILE_ROWS\" = {nr}, \"FILE_UPDATED\" = CURRENT_UTCTIMESTAMP ' \
-            ' WHERE \"TABLE\"  = \'{table}\' '.format(cs=checksum,nr = num_rows,repos_table = repos_table,table = table)
+            ' WHERE \"TABLE_NAME\"  = \'{table}\' '.format(cs=checksum,nr = num_rows,repos_table = repos_table,table = table)
             logger.info("SQL statement for consistency update: {}".format(sql))
             att['sql'] = sql
             api.send(outports[3]['name'],api.Message(attributes=att, body=sql))
@@ -183,9 +184,17 @@ U,2020-07-27T09:39:06.657Z,10,3'''
 if __name__ == '__main__':
     test_operator()
     if True :
-        subprocess.run(["rm", '-r','../../../solution/operators/sdi_replication_' + api.config.version])
+        basename = os.path.basename(__file__[:-3])
+        package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
+        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        solution_name = '{}_{}'.format(basename,api.config.version)
+        package_name_ver = '{}_{}'.format(package_name,api.config.version)
+        solution_dir = os.path.join(project_dir,'solution/operators',package_name_ver)
+        solution_file = os.path.join(solution_dir,solution_name+'.zip')
+
+        subprocess.run(["rm", '-r',solution_file])
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-        solution_name = api.config.operator_name + '_' + api.config.version
-        subprocess.run(["vctl", "solution", "bundle",'../../../solution/operators/sdi_replication_' + api.config.version, \
-                        "-t", solution_name])
-        subprocess.run(["mv", solution_name + '.zip', '../../../solution/operators'])
+
+        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t", solution_file])
+        subprocess.run(["mv", solution_file, os.path.join(project_dir,'solution/operators')])
+        logging.info(f"Solution created: {solution_file}")

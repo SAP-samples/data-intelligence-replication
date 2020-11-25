@@ -67,7 +67,7 @@ def process(msg):
         raise ValueError(err_stat)
 
     table = att['schema_name'] + '.' + att['table_name']
-    select_sql = 'SELECT \"CHECKSUM_COL\" FROM \"{repos}\"  WHERE \"TABLE\" = \'{table}\''.format(repos = table_repos, table = table)
+    select_sql = 'SELECT \"CHECKSUM_COL\" FROM \"{repos}\"  WHERE \"TABLE_NAME\" = \'{table}\''.format(repos = table_repos, table = table)
 
     logger.info('Select statement: {}'.format(select_sql))
     att['select_sql'] = select_sql
@@ -104,10 +104,18 @@ def test_operator():
 if __name__ == '__main__':
     test_operator()
     if True:
-        subprocess.run(["rm", '-r','../../../solution/operators/sdi_replication_' + api.config.version])
+        basename = os.path.basename(__file__[:-3])
+        package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
+        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        solution_name = '{}_{}'.format(basename,api.config.version)
+        package_name_ver = '{}_{}'.format(package_name,api.config.version)
+        solution_dir = os.path.join(project_dir,'solution/operators',package_name_ver)
+        solution_file = os.path.join(solution_dir,solution_name+'.zip')
+
+        subprocess.run(["rm", '-r',solution_file])
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-        solution_name = api.config.operator_name + '_' + api.config.version
-        subprocess.run(["vctl", "solution", "bundle",'../../../solution/operators/sdi_replication_' + api.config.version, \
-                        "-t", solution_name])
-        subprocess.run(["mv", solution_name + '.zip', '../../../solution/operators'])
+
+        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t", solution_file])
+        subprocess.run(["mv", solution_file, os.path.join(project_dir,'solution/operators')])
+        logging.info(f"Solution created: {solution_file}")
 

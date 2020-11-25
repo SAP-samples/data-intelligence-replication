@@ -4,7 +4,7 @@
     "inports": [
         {
             "name": "data",
-            "type": "message.table",
+            "type": "message",
             "description": "Input data"
         }
     ],
@@ -21,9 +21,10 @@
         }
     ],
     "config": {
-        "$type": "http://sap.com/vflow/sdi_replication.repl_block.configSchema.json",
+        "$type": "http://sap.com/vflow/di_replication.repl_block.configSchema.json",
         "script": "file://repl_block.py",
         "debug_mode": true,
+        "package_size": false,
         "use_package_id": false,
         "change_types": "UD"
     },

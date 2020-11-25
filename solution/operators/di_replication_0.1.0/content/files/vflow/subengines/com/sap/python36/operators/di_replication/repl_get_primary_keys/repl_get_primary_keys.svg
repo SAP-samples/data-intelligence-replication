@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <g transform="matrix(1.180952, 0, 0, 1.149104, -9.835453, -43.688725)" style="">
+    <g>
+      <g>
+        <rect x="30.142" y="83.653" width="226.552" height="220.191" style="fill: rgb(216, 216, 216); stroke-width: 11px; stroke: rgb(90, 90, 90);"/>
+      </g>
+      <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="30.142" y1="117.575" x2="256.907" y2="117.447"/>
+      <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="30.142" y1="179.539" x2="256.907" y2="179.411"/>
+      <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="29.929" y1="148.557" x2="256.694" y2="148.429"/>
+      <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="30.142" y1="210.521" x2="256.907" y2="210.393"/>
+      <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="30.142" y1="241.503" x2="256.907" y2="241.376"/>
+      <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="29.929" y1="272.485" x2="256.694" y2="272.358"/>
+      <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="82.575" y1="83.653" x2="82.793" y2="303.844"/>
+      <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="134.73" y1="307.79" x2="134.923" y2="83.653" transform="matrix(-1, 0, 0, -1, 269.653, 391.443008)"/>
+      <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="186.836" y1="303.844" x2="187.806" y2="83.653" transform="matrix(-1, 0, 0, -1, 374.641998, 387.496994)"/>
+    </g>
+  </g>
+  <g transform="matrix(0.93237, 0, 0, 0.806575, -51.684029, -2.620578)" style="">
+    <path d="M 869.523 299.098 m -55.496 0 a 55.496 55.496 0 1 0 110.992 0 a 55.496 55.496 0 1 0 -110.992 0 Z M 869.523 299.098 m -33.298 0 a 33.298 33.298 0 0 1 66.596 0 a 33.298 33.298 0 0 1 -66.596 0 Z" style="fill: rgb(245, 161, 40);" transform="matrix(-0.52725, 0.84971, -0.84971, -0.52725, 1206.239688, -436.465995)"/>
+    <rect x="481.801" y="189.284" width="28.893" height="149.206" style="fill: rgb(245, 161, 40);"/>
+    <rect x="438.459" y="323.927" width="43.342" height="14.563" style="fill: rgb(245, 161, 40);"/>
+    <rect x="459.815" y="314.039" width="21.986" height="10.015" style="fill: rgb(245, 161, 40);"/>
+    <rect x="449.7" y="307.79" width="32.101" height="6.377" style="fill: rgb(245, 161, 40);"/>
+    <rect x="438.459" y="293.072" width="43.342" height="14.718" style="fill: rgb(245, 161, 40);"/>
+  </g>
+</svg>
