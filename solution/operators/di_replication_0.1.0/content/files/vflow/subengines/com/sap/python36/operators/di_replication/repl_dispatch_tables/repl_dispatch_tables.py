@@ -8,8 +8,6 @@ import logging
 import subprocess
 
 import sdi_utils.gensolution as gs
-import sdi_utils.textfield_parser as tfp
-
 
 try:
     api
@@ -29,7 +27,7 @@ except NameError:
         class config:
             ## Meta data
             config_params = dict()
-            tags = {'sdi_utils':'', 'pandas':''}
+            tags = {'pandas':''}
             version = "0.1.0"
 
             operator_description = "Dispatch Tables"
@@ -89,10 +87,12 @@ def process(msg) :
         api.send(outports[0]['name'], log_stream.getvalue())
         return 0
 
-    if att['data_outcome'] == True:
+    if att['data_outcome'] == True :
         api.logger.debug('Reset \"number of changes\"-counter')
         no_changes_counter =  0
-    else :
+    elif first_call :
+        first_call = False;
+    else: # only when changes and not first_call in loop
         no_changes_counter += 1
         api.logger.debug('Changes counter: {}'.format(no_changes_counter))
 

@@ -57,7 +57,7 @@ except NameError:
 # catching logger messages for separate output
 log_stream = io.StringIO()
 sh = logging.StreamHandler(stream=log_stream)
-sh.setFormatter(logging.Formatter('%(asctime)s ;  %(levelname)s ; %(name)s ; %(message)s', datefmt='%H:%M:%S'))
+sh.setFormatter(logging.Formatter('%(asctime)s |  %(levelname)s | %(name)s | %(message)s', datefmt='%H:%M:%S'))
 api.logger.addHandler(sh)
 
 
@@ -85,6 +85,9 @@ def process(msg):
         api.logger.info('No data received, msg to port error_status sent.')
         api.send(outports[0]['name'], log_stream.getvalue())
         return 0
+
+    if api.config.only_header:
+        att['data_outcome'] = False  # Only one call necessary, but should send data for writing
 
     # always sort the columns alphabetically because DB columns do not have an order
     df = df[sorted(df.columns)]
