@@ -21,12 +21,11 @@
         }
     ],
     "config": {
-        "$type": "http://sap.com/vflow/sdi_replication.repl_read_primary_key_file.configSchema.json",
-        "script": "file://repl_read_primary_key.py",
-        "debug_mode": true
+        "$type": "http://sap.com/vflow/di_replication.repl_read_primary_key_file.configSchema.json",
+        "script": "file://repl_read_primary_key.py"
     },
     "tags": {
-        "sdi_utils": ""
+        "pandas": ""
     },
     "iconsrc": "repl_read_primary_keys.svg"
 }

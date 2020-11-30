@@ -1,14 +1,10 @@
-import io
+import sdi_utils.gensolution as gs
 import subprocess
 import os
-import pandas as pd
-import io
-import logging
 
-import sdi_utils.gensolution as gs
-import sdi_utils.set_logging as slog
-import sdi_utils.textfield_parser as tfp
-import sdi_utils.tprogress as tp
+import io
+import pandas as pd
+import logging
 
 pd.set_option('expand_frame_repr', True)
 pd.set_option('display.max_columns', 100)
@@ -40,10 +36,19 @@ except NameError:
             operator_description = "Merge Files"
             operator_description_long = "Merges all update files with the target file."
             add_readme = dict()
-            debug_mode = True
-            config_params['debug_mode'] = {'title': 'Debug mode',
-                                           'description': 'Sending debug level information to log port',
-                                           'type': 'boolean'}
+
+
+        format = '%(asctime)s |  %(levelname)s | %(name)s | %(message)s'
+        logging.basicConfig(level=logging.DEBUG, format=format, datefmt='%H:%M:%S')
+        logger = logging.getLogger(name=config.operator_name)
+
+
+
+# catching logger messages for separate output
+log_stream = io.StringIO()
+sh = logging.StreamHandler(stream=log_stream)
+sh.setFormatter(logging.Formatter('%(asctime)s |  %(levelname)s | %(name)s | %(message)s', datefmt='%H:%M:%S'))
+api.logger.addHandler(sh)
 
 df = pd.DataFrame()
 
@@ -54,7 +59,6 @@ def process(msg):
 
     att = dict(msg.attributes)
     att['operator'] = 'repl_merge_files'
-    logger, log_stream = slog.set_logging(att['operator'], loglevel=api.config.debug_mode)
 
     csv_io = io.BytesIO(msg.body)
     if att['target_file'] :
@@ -62,10 +66,10 @@ def process(msg):
     else :
         df = df.append(pd.read_csv(csv_io), ignore_index=True)
 
-    logger.debug('Update file: {} ({})'.format(df.shape[0],att['file']['path']))
+    api.logger.debug('Update file: {} ({})'.format(df.shape[0],att['file']['path']))
 
     if att['message.last_update_file']:
-        logger.debug('Last Update file - merge')
+        api.logger.debug('Last Update file - merge')
         #  cases:
         #  I,U: normal, U,I : should not happen, sth went wrong with original table (no test)
         #  I,D: normal, D,I : either sth went wrong in the repl. table or new record (no test)
@@ -92,7 +96,7 @@ def process(msg):
         repos_table = att['table_repository'] if 'table_repository' in att else ''
         checksum_col = att['checksum_col'] if 'checksum_col' in att else ''
         if not repos_table or not checksum_col :
-            logger.warning('Checksum not setup checksum_col: {}  repository table: {}'.format(checksum_col,repos_table))
+            api.logger.warning('Checksum not setup checksum_col: {}  repository table: {}'.format(checksum_col,repos_table))
         else :
             checksum = df[checksum_col].sum()
             num_rows = df.shape[0]
@@ -100,7 +104,7 @@ def process(msg):
             table = att['current_file']['schema_name'] + '.' +  att['current_file']['table_name']
             sql = 'UPDATE {repos_table} SET \"FILE_CHECKSUM\" = {cs}, \"FILE_ROWS\" = {nr}, \"FILE_UPDATED\" = CURRENT_UTCTIMESTAMP ' \
             ' WHERE \"TABLE_NAME\"  = \'{table}\' '.format(cs=checksum,nr = num_rows,repos_table = repos_table,table = table)
-            logger.info("SQL statement for consistency update: {}".format(sql))
+            api.logger.info("SQL statement for consistency update: {}".format(sql))
             att['sql'] = sql
             api.send(outports[3]['name'],api.Message(attributes=att, body=sql))
     else:
@@ -180,21 +184,23 @@ U,2020-07-27T09:39:06.657Z,10,3'''
         print(q.body)
 
 
-
 if __name__ == '__main__':
     test_operator()
     if True :
         basename = os.path.basename(__file__[:-3])
         package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
         project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-        solution_name = '{}_{}'.format(basename,api.config.version)
-        package_name_ver = '{}_{}'.format(package_name,api.config.version)
-        solution_dir = os.path.join(project_dir,'solution/operators',package_name_ver)
-        solution_file = os.path.join(solution_dir,solution_name+'.zip')
+        solution_name = '{}_{}.zip'.format(basename, api.config.version)
+        package_name_ver = '{}_{}'.format(package_name, api.config.version)
 
-        subprocess.run(["rm", '-r',solution_file])
+        solution_dir = os.path.join(project_dir, 'solution/operators', package_name_ver)
+        solution_file = os.path.join(project_dir, 'solution/operators', solution_name)
+
+        # rm solution directory
+        subprocess.run(["rm", '-r', solution_dir])
+
+        # create solution directory with generated operator files
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
 
+        # Bundle solution directory with generated operator files
         subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t", solution_file])
-        subprocess.run(["mv", solution_file, os.path.join(project_dir,'solution/operators')])
-        logging.info(f"Solution created: {solution_file}")

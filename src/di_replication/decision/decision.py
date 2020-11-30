@@ -2,17 +2,13 @@ import sdi_utils.gensolution as gs
 import subprocess
 import os
 
-import logging
 import io
-
+import logging
 
 try:
     api
 except NameError:
     class api:
-
-        queue = list()
-
         class Message:
             def __init__(self, body=None, attributes=""):
                 self.body = body
@@ -20,19 +16,24 @@ except NameError:
 
         def send(port, msg):
             if port == outports[1]['name']:
-                api.queue.append(msg)
+                print('Message passed: {} - {}'.format(msg.attributes,msg.body))
+            elif port == outports[2]['name']:
+                print('Message did not pass: {} - {}'.format(msg.attributes,msg.body))
 
         class config:
             ## Meta data
             config_params = dict()
-            version = '0.0.1'
             tags = {}
-            operator_name = 'repl_complete'
-            operator_description = "Repl. Complete"
+            version = "0.1.0"
+            operator_name = 'decision'
+            operator_description = "Decision"
+            operator_description_long = "Decision gate that channels messages."
 
-            operator_description_long = "Update replication table status to complete."
-            add_readme = dict()
-            add_readme["References"] = ""
+            decision_attribute = 'message.lastBatch'
+            config_params['decision_attribute'] = {'title': 'Descision Attribute',
+                                           'description': 'Decision Attribute',
+                                           'type': 'string'}
+
 
         format = '%(asctime)s |  %(levelname)s | %(name)s | %(message)s'
         logging.basicConfig(level=logging.DEBUG, format=format, datefmt='%H:%M:%S')
@@ -46,51 +47,37 @@ sh = logging.StreamHandler(stream=log_stream)
 sh.setFormatter(logging.Formatter('%(asctime)s |  %(levelname)s | %(name)s | %(message)s', datefmt='%H:%M:%S'))
 api.logger.addHandler(sh)
 
-api.logger.info('Logger setup')
 
 def process(msg):
 
-    att = dict(msg.attributes)
-    att['operator'] = 'repl_complete'
-
-    api.logger.info("Process started")
-
-    api.logger.debug('Attributes: {} - {}'.format(str(msg.attributes),str(att)))
-
-    # The constraint of STATUS = 'B' due the case the record was updated in the meanwhile
-    sql = 'UPDATE {table} SET \"DIREPL_STATUS\" = \'C\' WHERE  \"DIREPL_PID\" = {pid} AND \"DIREPL_STATUS\" = \'B\''.\
-        format(table=att['replication_table'], pid = att['pid'])
-
-    api.logger.info('Update statement: {}'.format(sql))
-    att['sql'] = sql
-
-    api.logger.info('Process ended')
-    #api.send(outports[1]['name'], update_sql)
-    api.send(outports[1]['name'], api.Message(attributes=att,body=sql))
-
-    log = log_stream.getvalue()
-    api.send(outports[0]['name'], log )
+    if api.config.decision_attribute in msg.attributes and msg.attributes[api.config.decision_attribute] == True:
+        api.send(outports[1]['name'], msg)
+        api.logger.info('Msg passed: {}'.format(msg.attributes))
+        api.send(outports[0]['name'], log_stream.getvalue())
+    else :
+        api.send(outports[2]['name'], msg)
+        api.logger.info('Msg did not pass: {}'.format(msg.attributes))
+        api.send(outports[0]['name'], log_stream.getvalue())
 
 
-inports = [{'name': 'data', 'type': 'message.file', "description": "Input data"}]
+inports = [{"name": "input", "type": "message.*", "description": "Input data"}]
 outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
-            {'name': 'msg', 'type': 'message', "description": "msg with sql statement"}]
+            {'name': 'True', 'type': 'message.*', "description": "True message"},
+            {"name": "False", "type": "message.*", "description": "False message"}]
 
 #api.set_port_callback(inports[0]['name'], process)
 
+
 def test_operator():
-
-    msg = api.Message(attributes={'pid': 123123213, 'table':'REPL_TABLE','base_table':'REPL_TABLE','latency':30,\
-                                  'replication_table':'repl_table', 'data_outcome':True,'packageid':1},body='')
-    process(msg)
-
-    for st in api.queue :
-        print(st)
+    #api.config.last_attribute = 'message.last_update'
+    process(api.Message(attributes={'message.lastBatch':False},body='0'))
+    process(api.Message(attributes={'message.lastBatch':True},body='1'))
+    process(api.Message(attributes={'message.last_update': True}, body='2'))
 
 
 if __name__ == '__main__':
     test_operator()
-    if True:
+    if True :
         basename = os.path.basename(__file__[:-3])
         package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
         project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -108,4 +95,3 @@ if __name__ == '__main__':
 
         # Bundle solution directory with generated operator files
         subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t", solution_file])
-

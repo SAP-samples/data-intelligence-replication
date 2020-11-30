@@ -1,14 +1,9 @@
-import io
-
-import os
-import time
-
-import subprocess
-
 import sdi_utils.gensolution as gs
-import sdi_utils.set_logging as slog
-import sdi_utils.textfield_parser as tfp
-import sdi_utils.tprogress as tp
+import subprocess
+import os
+
+import io
+import logging
 
 try:
     api
@@ -29,17 +24,13 @@ except NameError:
         class config:
             ## Meta data
             config_params = dict()
-            tags = {'sdi_utils':''}
+            tags = {}
             version = "0.1.0"
 
             operator_description = "Repl. Dispatch Files"
             operator_name = 'repl_dispatch_files'
             operator_description_long = "Dispatch files."
             add_readme = dict()
-            debug_mode = True
-            config_params['debug_mode'] = {'title': 'Debug mode',
-                                           'description': 'Sending debug level information to log port',
-                                           'type': 'boolean'}
 
             file_path_att = 'P'
             config_params['file_path_att'] = {'title': 'File Path Attribute (B/P/C)',
@@ -62,6 +53,18 @@ except NameError:
                                            'type': 'boolean'}
 
 
+        format = '%(asctime)s |  %(levelname)s | %(name)s | %(message)s'
+        logging.basicConfig(level=logging.DEBUG, format=format, datefmt='%H:%M:%S')
+        logger = logging.getLogger(name=config.operator_name)
+
+
+
+# catching logger messages for separate output
+log_stream = io.StringIO()
+sh = logging.StreamHandler(stream=log_stream)
+sh.setFormatter(logging.Formatter('%(asctime)s |  %(levelname)s | %(name)s | %(message)s', datefmt='%H:%M:%S'))
+api.logger.addHandler(sh)
+
 
 files_list = list()
 file_index = 0
@@ -77,23 +80,22 @@ def process(msg) :
 
     att = dict(msg.attributes)
     att['operator'] = 'repl_dispatch_files'
-    logger, log_stream = slog.set_logging(att['operator'], loglevel=api.config.debug_mode)
 
     if len(files_list) == 0:
         err_statement = 'No files to process!'
-        logger.error(err_statement)
+        api.logger.error(err_statement)
         raise ValueError(err_statement)
 
     file_path_att = api.config.file_path_att
     if not file_path_att in 'CPB':
         err_statement = "File path attribute wrongly set (C or P or B) not  {}!".format(api.config.file_path_att)
-        logger.error(err_statement)
+        api.logger.error(err_statement)
         raise ValueError(err_statement)
 
     criteria_match = False
     while (not criteria_match):
         if file_index == len(files_list):
-            logger.info('No files to process - ending pipeline')
+            api.logger.info('No files to process - ending pipeline')
             api.send(outports[0]['name'], log_stream.getvalue())
             api.send(outports[2]['name'], api.Message(attributes=att, body=None))
             return 0
@@ -110,23 +112,23 @@ def process(msg) :
 
         u_criteria = True
         if len(files_list[file_index]['update_files']) == 0 and api.config.update_files_mandatory == True:
-            logger.warning('Update files mandatory, but not found: {}'.format(files_list[file_index]['dir']))
+            api.logger.warning('Update files mandatory, but not found: {}'.format(files_list[file_index]['dir']))
             u_criteria = False
 
         b_criteria = True
         if len(files_list[file_index]['base_file']) == 0 and api.config.base_file_mandatory == True:
-            logger.warning('Base file mandatory, but not found: {}'.format(files_list[file_index]['dir']))
+            api.logger.warning('Base file mandatory, but not found: {}'.format(files_list[file_index]['dir']))
             b_criteria = False
 
         pk_criteria = True
         if len(files_list[file_index]['base_file']) == 0 and api.config.base_file_mandatory == True:
-            logger.warning('Primary key file mandatory, but not found: {}'.format(files_list[file_index]['dir']))
+            api.logger.warning('Primary key file mandatory, but not found: {}'.format(files_list[file_index]['dir']))
             pk_criteria = False
 
         criteria_match = fpa_criteria and u_criteria and pk_criteria and b_criteria
-        logger.debug('Criteria: {}'.format(criteria_match))
+        api.logger.debug('Criteria: {}'.format(criteria_match))
         if criteria_match == False :
-            logger.debug('File does not comply to requirements: file path:{} -> next '.format(files_list[file_index]['dir']))
+            api.logger.debug('File does not comply to requirements: file path:{} -> next '.format(files_list[file_index]['dir']))
             file_index += 1
 
     att['message.batchIndex'] = file_index
@@ -140,7 +142,7 @@ def process(msg) :
     att['schema_name'] = files_list[file_index]['schema_name']
     att['current_file'] = files_list[file_index]
 
-    logger.info('Send File: {} ({}/{})'.format(files_list[file_index]['schema_name'],files_list[file_index]['table_name'],\
+    api.logger.info('Send File: {} ({}/{})'.format(files_list[file_index]['schema_name'],files_list[file_index]['table_name'],\
                                                file_index, len(files_list)))
     api.send(outports[1]['name'], api.Message(attributes=att,body=files_list[file_index]))
     file_index += 1
@@ -224,12 +226,22 @@ def test_operator() :
 if __name__ == '__main__':
     test_operator()
     if True:
-        subprocess.run(["rm", '-r','../../../solution/operators/sdi_replication_' + api.config.version])
-        gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-        solution_name = api.config.operator_name + '_' + api.config.version
-        subprocess.run(["vctl", "solution", "bundle",'../../../solution/operators/sdi_replication_' + api.config.version, \
-                        "-t", solution_name])
-        subprocess.run(["mv", solution_name + '.zip', '../../../solution/operators'])
+        basename = os.path.basename(__file__[:-3])
+        package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
+        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        solution_name = '{}_{}.zip'.format(basename, api.config.version)
+        package_name_ver = '{}_{}'.format(package_name, api.config.version)
 
+        solution_dir = os.path.join(project_dir, 'solution/operators', package_name_ver)
+        solution_file = os.path.join(project_dir, 'solution/operators', solution_name)
+
+        # rm solution directory
+        subprocess.run(["rm", '-r', solution_dir])
+
+        # create solution directory with generated operator files
+        gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
+
+        # Bundle solution directory with generated operator files
+        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t", solution_file])
 
 

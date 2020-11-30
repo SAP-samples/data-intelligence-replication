@@ -31,16 +31,13 @@
         }
     ],
     "config": {
-        "$type": "http://sap.com/vflow/sdi_replication.repl_dispatch_files.configSchema.json",
+        "$type": "http://sap.com/vflow/di_replication.repl_dispatch_files.configSchema.json",
         "script": "file://repl_dispatch_files.py",
-        "debug_mode": true,
         "file_path_att": "P",
         "update_files_mandatory": true,
         "base_file_mandatory": true,
         "primary_key_file_mandatory": true
     },
-    "tags": {
-        "sdi_utils": ""
-    },
+    "tags": {},
     "iconsrc": "repl_dispatch_files.svg"
 }

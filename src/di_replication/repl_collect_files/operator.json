@@ -21,12 +21,9 @@
         }
     ],
     "config": {
-        "$type": "http://sap.com/vflow/sdi_replication.repl_collect_files.configSchema.json",
-        "script": "file://repl_collect_files.py",
-        "debug_mode": true
+        "$type": "http://sap.com/vflow/di_replication.repl_collect_files.configSchema.json",
+        "script": "file://repl_collect_files.py"
     },
-    "tags": {
-        "sdi_utils": ""
-    },
+    "tags": {},
     "iconsrc": "repl_collect_files.svg"
 }

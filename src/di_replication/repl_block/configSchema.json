@@ -9,11 +9,6 @@
         "script": {
             "type": "string"
         },
-        "debug_mode": {
-            "title": "Debug mode",
-            "description": "Sending debug level information to log port",
-            "type": "boolean"
-        },
         "package_size": {
             "title": "Package size",
             "description": "Defining the package size that should be picked for replication. This is not used together with 'Pacakge ID'",

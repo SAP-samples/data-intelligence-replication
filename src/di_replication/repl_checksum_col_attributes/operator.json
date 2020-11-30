@@ -21,13 +21,10 @@
         }
     ],
     "config": {
-        "$type": "http://sap.com/vflow/sdi_replication.repl_checksum_col_attributes.configSchema.json",
+        "$type": "http://sap.com/vflow/di_replication.repl_checksum_col_attributes.configSchema.json",
         "script": "file://repl_checksum_col_attributes.py",
-        "debug_mode": true,
         "file_path_att": "P"
     },
-    "tags": {
-        "sdi_utils": ""
-    },
+    "tags": {},
     "iconsrc": "repl_checksum_col_attributes.svg"
 }

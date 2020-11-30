@@ -23,13 +23,10 @@
     "config": {
         "$type": "http://sap.com/vflow/di_replication.repl_block.configSchema.json",
         "script": "file://repl_block.py",
-        "debug_mode": true,
         "package_size": false,
         "use_package_id": false,
         "change_types": "UD"
     },
-    "tags": {
-        "sdi_utils": ""
-    },
+    "tags": {},
     "iconsrc": "repl_block.svg"
 }

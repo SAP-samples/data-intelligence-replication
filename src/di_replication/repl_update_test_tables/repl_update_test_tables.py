@@ -57,7 +57,7 @@ except NameError:
 # catching logger messages for separate output
 log_stream = io.StringIO()
 sh = logging.StreamHandler(stream=log_stream)
-sh.setFormatter(logging.Formatter('%(asctime)s ;  %(levelname)s ; %(name)s ; %(message)s', datefmt='%H:%M:%S'))
+sh.setFormatter(logging.Formatter('%(asctime)s |  %(levelname)s | %(name)s | %(message)s', datefmt='%H:%M:%S'))
 api.logger.addHandler(sh)
 
 def process(msg):

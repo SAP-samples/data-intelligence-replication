@@ -1,13 +1,10 @@
-import io
+import sdi_utils.gensolution as gs
 import subprocess
 import os
-import pandas as pd
-import io
 
-import sdi_utils.gensolution as gs
-import sdi_utils.set_logging as slog
-import sdi_utils.textfield_parser as tfp
-import sdi_utils.tprogress as tp
+import io
+import logging
+import pandas as pd
 
 try:
     api
@@ -28,30 +25,36 @@ except NameError:
         class config:
             ## Meta data
             config_params = dict()
-            tags = {'sdi_utils':''}
+            tags = {'pandas':''}
             version = "0.0.1"
             operator_name = 'repl_read_primary_key_file'
             operator_description = "Read Primary Key"
             operator_description_long = "Read primary key file."
             add_readme = dict()
-            debug_mode = True
-            config_params['debug_mode'] = {'title': 'Debug mode',
-                                           'description': 'Sending debug level information to log port',
-                                           'type': 'boolean'}
+
+        format = '%(asctime)s |  %(levelname)s | %(name)s | %(message)s'
+        logging.basicConfig(level=logging.DEBUG, format=format, datefmt='%H:%M:%S')
+        logger = logging.getLogger(name=config.operator_name)
+
+
+# catching logger messages for separate output
+log_stream = io.StringIO()
+sh = logging.StreamHandler(stream=log_stream)
+sh.setFormatter(logging.Formatter('%(asctime)s |  %(levelname)s | %(name)s | %(message)s', datefmt='%H:%M:%S'))
+api.logger.addHandler(sh)
 
 
 def process(msg):
 
     att = dict(msg.attributes)
     att['operator'] = 'read_primary_key_file'
-    logger, log_stream = slog.set_logging(att['operator'], loglevel=api.config.debug_mode)
 
     ## read csv
     csv_io = io.BytesIO(msg.body)
     key_df = pd.read_csv(csv_io)
 
     att['current_primary_keys'] = key_df['COLUMN_NAME'].values.tolist()
-    logger.info('Primary key: {}  ({})'.format(att['current_primary_keys'],att['current_file']['table_name']))
+    api.logger.info('Primary key: {}  ({})'.format(att['current_primary_keys'],att['current_file']['table_name']))
     att['file']['path'] = os.path.join(att['current_file']['dir'], att['current_file']['base_file'])
 
     msg = api.Message(attributes=att, body=att['current_file']['table_name'])
@@ -93,9 +96,20 @@ def test_operator() :
 if __name__ == '__main__':
     test_operator()
     if True :
-        subprocess.run(["rm", '-r','../../../solution/operators/sdi_replication_' + api.config.version])
+        basename = os.path.basename(__file__[:-3])
+        package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
+        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        solution_name = '{}_{}.zip'.format(basename, api.config.version)
+        package_name_ver = '{}_{}'.format(package_name, api.config.version)
+
+        solution_dir = os.path.join(project_dir, 'solution/operators', package_name_ver)
+        solution_file = os.path.join(project_dir, 'solution/operators', solution_name)
+
+        # rm solution directory
+        subprocess.run(["rm", '-r', solution_dir])
+
+        # create solution directory with generated operator files
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-        solution_name = api.config.operator_name + '_' + api.config.version
-        subprocess.run(["vctl", "solution", "bundle",'../../../solution/operators/sdi_replication_' + api.config.version, \
-                        "-t", solution_name])
-        subprocess.run(["mv", solution_name + '.zip', '../../../solution/operators'])
+
+        # Bundle solution directory with generated operator files
+        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t", solution_file])

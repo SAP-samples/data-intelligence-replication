@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "$id": "http://sap.com/vflow/di_replication.repl_dispatch_tables.configSchema.json",
+    "$id": "http://sap.com/vflow/di_replication.decision.configSchema.json",
     "type": "object",
     "properties": {
         "codelanguage": {
@@ -9,10 +9,10 @@
         "script": {
             "type": "string"
         },
-        "stop_no_changes": {
-            "title": "Stops on no changes",
-            "description": "Stops when no changes.",
-            "type": "boolean"
+        "decision_attribute": {
+            "title": "Descision Attribute",
+            "description": "Decision Attribute",
+            "type": "string"
         }
     }
 }

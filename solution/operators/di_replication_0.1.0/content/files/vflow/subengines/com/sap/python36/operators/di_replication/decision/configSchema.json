@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "$id": "http://sap.com/vflow/di_replication.repl_checksum_col_attributes.configSchema.json",
+    "$id": "http://sap.com/vflow/di_replication.decision.configSchema.json",
     "type": "object",
     "properties": {
         "codelanguage": {
@@ -9,9 +9,9 @@
         "script": {
             "type": "string"
         },
-        "file_path_att": {
-            "title": "File Path Attribute (B/P)",
-            "description": "Set File Path Attribute (B-ase or P-rimary Key)",
+        "decision_attribute": {
+            "title": "Descision Attribute",
+            "description": "Decision Attribute",
             "type": "string"
         }
     }

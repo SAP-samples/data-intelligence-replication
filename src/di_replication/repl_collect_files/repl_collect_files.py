@@ -1,15 +1,13 @@
-import io
-
+import sdi_utils.gensolution as gs
+import subprocess
 import os
+
+import io
+import logging
+
 import re
 import json
 
-import subprocess
-
-import sdi_utils.gensolution as gs
-import sdi_utils.set_logging as slog
-import sdi_utils.textfield_parser as tfp
-import sdi_utils.tprogress as tp
 
 try:
     api
@@ -30,17 +28,25 @@ except NameError:
         class config:
             ## Meta data
             config_params = dict()
-            tags = {'sdi_utils': ''}
+            tags = {}
             version = "0.1.0"
 
             operator_description = "Repl. Collect Files"
             operator_name = 'repl_collect_files'
             operator_description_long = "Collect files and send a dict."
             add_readme = dict()
-            debug_mode = True
-            config_params['debug_mode'] = {'title': 'Debug mode',
-                                           'description': 'Sending debug level information to log port',
-                                           'type': 'boolean'}
+
+        format = '%(asctime)s |  %(levelname)s | %(name)s | %(message)s'
+        logging.basicConfig(level=logging.DEBUG, format=format, datefmt='%H:%M:%S')
+        logger = logging.getLogger(name=config.operator_name)
+
+
+
+# catching logger messages for separate output
+log_stream = io.StringIO()
+sh = logging.StreamHandler(stream=log_stream)
+sh.setFormatter(logging.Formatter('%(asctime)s |  %(levelname)s | %(name)s | %(message)s', datefmt='%H:%M:%S'))
+api.logger.addHandler(sh)
 
 table_collector = dict()
 num_tables = 0
@@ -53,9 +59,7 @@ def process(msg):
     att = dict(msg.attributes)
     att['operator'] = 'repl_collect_files'
 
-    logger, log_stream = slog.set_logging(att['operator'], loglevel=api.config.debug_mode)
-    logger.info("Process started. Logging level: {}".format(logger.level))
-    time_monitor = tp.progress()
+    api.logger.info("Process started")
 
     dir_name = os.path.dirname(att['file']['path'])
     filename = os.path.basename(att['file']['path'])
@@ -82,15 +86,15 @@ def process(msg):
         table_collector[schema_name][table_name]['misc'].append(filename)
 
 
-    logger.info('File collected: {}'.format(table_collector[schema_name][table_name]))
+    api.logger.info('File collected: {}'.format(table_collector[schema_name][table_name]))
 
     if att['message.lastBatch'] == True:
 
         # flat structure
         files = [ b for a in list(table_collector.values()) for b in list(a.values())]
 
-        logger.info('Send table collector. #files: {}'.format(len(table_collector)))
-        logger.info('Process ended - {}'.format(time_monitor.elapsed_time()))
+        api.logger.info('Send table collector. #files: {}'.format(len(table_collector)))
+        api.logger.info('Process ended')
         msg = api.Message(attributes=att, body=files)
         api.send(outports[1]['name'], msg )
 
@@ -154,13 +158,23 @@ def test_operator():
 if __name__ == '__main__':
     test_operator()
     if True:
-        subprocess.run(["rm", '-r', '../../../solution/operators/sdi_replication_' + api.config.version])
+        basename = os.path.basename(__file__[:-3])
+        package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
+        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        solution_name = '{}_{}.zip'.format(basename, api.config.version)
+        package_name_ver = '{}_{}'.format(package_name, api.config.version)
+
+        solution_dir = os.path.join(project_dir, 'solution/operators', package_name_ver)
+        solution_file = os.path.join(project_dir, 'solution/operators', solution_name)
+
+        # rm solution directory
+        subprocess.run(["rm", '-r', solution_dir])
+
+        # create solution directory with generated operator files
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-        solution_name = api.config.operator_name + '_' + api.config.version
-        subprocess.run(
-            ["vctl", "solution", "bundle", '../../../solution/operators/sdi_replication_' + api.config.version, \
-             "-t", solution_name])
-        subprocess.run(["mv", solution_name + '.zip', '../../../solution/operators'])
+
+        # Bundle solution directory with generated operator files
+        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t", solution_file])
 
 
 

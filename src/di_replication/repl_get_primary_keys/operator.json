@@ -22,11 +22,8 @@
     ],
     "config": {
         "$type": "http://sap.com/vflow/di_replication.repl_get_primary_keys.configSchema.json",
-        "script": "file://repl_get_primary_keys.py",
-        "debug_mode": true
+        "script": "file://repl_get_primary_keys.py"
     },
-    "tags": {
-        "sdi_utils": ""
-    },
+    "tags": {},
     "iconsrc": "repl_get_primary_keys.svg"
 }
