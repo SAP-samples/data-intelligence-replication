@@ -215,3 +215,4 @@ Copyright (c) 2020 SAP SE or an SAP affiliate company. All rights reserved. This
 
 
 
+[![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/data-intelligence-replication)](https://api.reuse.software/info/github.com/SAP-samples/data-intelligence-replication)
