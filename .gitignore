@@ -13,6 +13,7 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+#deprecated/
 .Python
 build/
 develop-eggs/
