@@ -27,8 +27,6 @@
         "num_rows": 100,
         "package_size": 5
     },
-    "tags": {
-        "sdi_utils": ""
-    },
+    "tags": {},
     "iconsrc": "repl_populate_test_tables.svg"
 }

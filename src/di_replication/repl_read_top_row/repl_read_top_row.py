@@ -27,7 +27,7 @@ except NameError:
         class config:
             ## Meta data
             config_params = dict()
-            version = '0.0.1'
+            version = '0.1.0'
             tags = {}
             operator_name = 'repl_read_top_row'
             operator_description = "Read Top Row"
@@ -35,6 +35,7 @@ except NameError:
             add_readme = dict()
             add_readme["References"] = ""
 
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
         logger = logging.getLogger(name=config.operator_name)
 
 # catching logger messages for separate output

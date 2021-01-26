@@ -26,8 +26,6 @@
         "num_inserts": 10,
         "max_random_num": 10000
     },
-    "tags": {
-        "sdi_utils": ""
-    },
+    "tags": {},
     "iconsrc": "repl_insert_test_tables.svg"
 }

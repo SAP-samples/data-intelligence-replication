@@ -1,10 +1,10 @@
 {
-    "description": "Add Test Tables to Repository Table",
+    "description": "Gate",
     "component": "com.sap.system.python3Operator",
     "inports": [
         {
             "name": "data",
-            "type": "message.table",
+            "type": "message.*",
             "description": "Input data"
         }
     ],
@@ -16,15 +16,14 @@
         },
         {
             "name": "data",
-            "type": "message.table",
-            "description": "data"
+            "type": "message",
+            "description": "Output of unchanged last input data"
         }
     ],
     "config": {
-        "$type": "http://sap.com/vflow/di_replication.repl_add_test_tables.configSchema.json",
-        "script": "file://repl_add_test_tables.py",
-        "debug_mode": true
+        "$type": "http://sap.com/vflow/di_replication.gate.configSchema.json",
+        "script": "file://gate.py"
     },
     "tags": {},
-    "iconsrc": "repl_add_test_tables.svg"
+    "iconsrc": "gate.svg"
 }

@@ -27,7 +27,7 @@ except NameError:
         class config:
             ## Meta data
             config_params = dict()
-            version = '0.0.1'
+            version = '0.1.0'
             tags = {}
             operator_name = 'repl_block'
             operator_description = "Repl. Block"
@@ -53,7 +53,7 @@ except NameError:
                                        'type': 'string'}
 
         format = '%(asctime)s |  %(levelname)s | %(name)s | %(message)s'
-        logging.basicConfig(level=logging.DEBUG, format=format, datefmt='%H:%M:%S')
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
         logger = logging.getLogger(name=config.operator_name)
 
 

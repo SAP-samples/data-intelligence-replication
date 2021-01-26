@@ -5,9 +5,7 @@ import os
 import logging
 import io
 import random
-from datetime import datetime, timezone, timedelta
 import pandas as pd
-import numpy as np
 
 pd.set_option('mode.chained_assignment',None)
 
@@ -32,7 +30,7 @@ except NameError:
         class config:
             ## Meta data
             config_params = dict()
-            version = '0.0.1'
+            version = '0.1.0'
             tags = {}
             operator_name = 'repl_update_test_tables'
             operator_description = "Update Test Tables"
@@ -52,6 +50,7 @@ except NameError:
                                            'description': 'Maximum random number.',
                                            'type': 'integer'}
 
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
         logger = logging.getLogger(name=config.operator_name)
 
 # catching logger messages for separate output

@@ -29,8 +29,8 @@ except NameError:
         class config:
             ## Meta data
             config_params = dict()
-            tags = {'sdi_utils': ''}
-            version = "0.0.1"
+            tags = {'sdi_utils':''}
+            version = "0.1.0"
             operator_name = 'repl_table_csv'
             operator_description = "table to csv"
             operator_description_long = "Converts table to csv stream."
@@ -52,6 +52,7 @@ except NameError:
                                            'description': 'List of columns to drop.',
                                            'type': 'string'}
 
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
         logger = logging.getLogger(name=config.operator_name)
 
 # catching logger messages for separate output
@@ -159,20 +160,10 @@ def test_operator() :
 if __name__ == '__main__':
     test_operator()
     if True :
-        basename = os.path.basename(__file__[:-3])
-        package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
-        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-        solution_name = '{}_{}.zip'.format(basename,api.config.version)
-        package_name_ver = '{}_{}'.format(package_name,api.config.version)
-
-        solution_dir = os.path.join(project_dir,'solution/operators',package_name_ver)
-        solution_file = os.path.join(project_dir,'solution/operators',solution_name)
-
-        # rm solution directory
-        subprocess.run(["rm", '-r',solution_dir])
-
-        # create solution directory with generated operator files
+        subprocess.run(["rm", '-r', './solution/operators/di_replication_' + api.config.version])
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-
-        # Bundle solution directory with generated operator files
-        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t",solution_file])
+        solution_name = api.config.operator_name + '_' + api.config.version
+        subprocess.run(
+            ["vctl", "solution", "bundle", './solution/operators/di_replication_' + api.config.version, "-t",
+             solution_name])
+        subprocess.run(["mv", solution_name + '.zip', './solution/operators'])

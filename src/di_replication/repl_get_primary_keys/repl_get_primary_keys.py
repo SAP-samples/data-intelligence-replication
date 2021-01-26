@@ -8,9 +8,6 @@ import logging
 import io
 
 
-
-
-
 try:
     api
 except NameError:
@@ -36,6 +33,7 @@ except NameError:
             operator_description_long = "Get primary keys of all tables of table repository"
             add_readme = dict()
 
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
         logger = logging.getLogger(name=config.operator_name)
 
 

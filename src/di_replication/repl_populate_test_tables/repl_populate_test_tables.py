@@ -1,6 +1,4 @@
 import sdi_utils.gensolution as gs
-#import sdi_utils.set_logging as slog
-import sdi_utils.textfield_parser as tfp
 
 import subprocess
 import logging
@@ -32,8 +30,8 @@ except NameError:
         class config:
             ## Meta data
             config_params = dict()
-            version = '0.0.1'
-            tags = {'sdi_utils': ''}
+            version = '0.1.0'
+            tags = {}
             operator_name = 'repl_populate_test_tables'
             operator_description = "Populate Test Tables"
 
@@ -56,8 +54,9 @@ except NameError:
             config_params['package_size'] = {'title': 'Package size',
                                            'description': 'Package size',
                                            'type': 'integer'}
-        logger = logging.getLogger(name=config.operator_name)
 
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+        logger = logging.getLogger(name=config.operator_name)
 
 # catching logger messages for separate output
 log_stream = io.StringIO()
@@ -160,18 +159,9 @@ def test_operator():
 if __name__ == '__main__':
     test_operator()
     if True:
-        basename = os.path.basename(__file__[:-3])
-        package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
-        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-        solution_name = '{}_{}'.format(basename,api.config.version)
-        package_name_ver = '{}_{}'.format(package_name,api.config.version)
-        solution_dir = os.path.join(project_dir,'solution/operators',package_name_ver)
-        solution_file = os.path.join(solution_dir,solution_name+'.zip')
-
-        subprocess.run(["rm", '-r',solution_file])
+        subprocess.run(["rm", '-r','./solution/operators/di_replication_' + api.config.version])
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-
-        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t", solution_file])
-        subprocess.run(["mv", solution_file, os.path.join(project_dir,'solution/operators')])
-        logging.info(f"Solution created: {solution_file}")
+        solution_name = api.config.operator_name + '_' + api.config.version
+        subprocess.run(["vctl", "solution", "bundle",'./solution/operators/di_replication_' + api.config.version, "-t", solution_name])
+        subprocess.run(["mv", solution_name + '.zip', './solution/operators'])
 

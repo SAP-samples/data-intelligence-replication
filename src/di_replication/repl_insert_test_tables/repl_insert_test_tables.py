@@ -52,6 +52,7 @@ except NameError:
                                            'description': 'Maximum random number.',
                                            'type': 'integer'}
 
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
         logger = logging.getLogger(name=config.operator_name)
 
 # catching logger messages for separate output

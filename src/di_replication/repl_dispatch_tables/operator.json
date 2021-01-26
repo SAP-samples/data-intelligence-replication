@@ -35,8 +35,6 @@
         "script": "file://repl_dispatch_tables.py",
         "stop_no_changes": true
     },
-    "tags": {
-        "pandas": ""
-    },
+    "tags": {},
     "iconsrc": "repl_dispatch_tables.svg"
 }

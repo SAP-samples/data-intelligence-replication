@@ -32,8 +32,6 @@
         "only_header": false,
         "drop_columns": "None"
     },
-    "tags": {
-        "sdi_utils": ""
-    },
+    "tags": {},
     "iconsrc": "repl_table_csv.svg"
 }

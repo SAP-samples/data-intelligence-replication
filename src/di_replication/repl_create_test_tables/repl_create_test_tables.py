@@ -1,14 +1,13 @@
 import sdi_utils.gensolution as gs
-import sdi_utils.textfield_parser as tfp
+
 
 import subprocess
 import logging
 import os
 import io
-import random
-from datetime import datetime, timezone, timedelta
+
 import pandas as pd
-import numpy as np
+
 
 pd.set_option('mode.chained_assignment',None)
 
@@ -33,8 +32,8 @@ except NameError:
         class config:
             ## Meta data
             config_params = dict()
-            version = '0.0.1'
-            tags = {'sdi_utils': ''}
+            version = '0.1.0'
+            tags = {}
             operator_name = 'repl_create_test_tables'
             operator_description = "Create Test Tables"
 
@@ -106,7 +105,6 @@ def process():
     api.send(outports[0]['name'], log_stream.getvalue())
 
 
-inports = [{'name': 'data', 'type': 'message.table', "description": "Input data"}]
 outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
             {'name': 'sql', 'type': 'message', "description": "msg with sql"}]
 
@@ -116,7 +114,7 @@ def test_operator():
     api.config.off_set = 2
     api.config.num_rows = 10
     msg = api.Message(attributes={'packageid':4711,'replication_table':'repl_table'},body='')
-    process(msg)
+    process()
 
 
     for st in api.sql_queue :
@@ -130,18 +128,10 @@ def test_operator():
 if __name__ == '__main__':
     test_operator()
     if True:
-        basename = os.path.basename(__file__[:-3])
-        package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
-        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-        solution_name = '{}_{}'.format(basename,api.config.version)
-        package_name_ver = '{}_{}'.format(package_name,api.config.version)
-        solution_dir = os.path.join(project_dir,'solution/operators',package_name_ver)
-        solution_file = os.path.join(solution_dir,solution_name+'.zip')
-
-        subprocess.run(["rm", '-r',solution_file])
+        subprocess.run(["rm", '-r','./solution/operators/di_replication_' + api.config.version])
+        api.logger.info('create solution')
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-
-        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t", solution_file])
-        subprocess.run(["mv", solution_file, os.path.join(project_dir,'solution/operators')])
-        logging.info(f"Solution created: {solution_file}")
+        solution_name = api.config.operator_name + '_' + api.config.version
+        subprocess.run(["vctl", "solution", "bundle",'./solution/operators/di_replication_' + api.config.version, "-t", solution_name])
+        subprocess.run(["mv", solution_name + '.zip', './solution/operators'])
 

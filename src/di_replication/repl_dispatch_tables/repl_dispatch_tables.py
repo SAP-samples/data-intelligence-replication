@@ -27,7 +27,7 @@ except NameError:
         class config:
             ## Meta data
             config_params = dict()
-            tags = {'pandas':''}
+            tags = {}
             version = "0.1.0"
 
             operator_description = "Dispatch Tables"
@@ -40,6 +40,7 @@ except NameError:
                                            'description': 'Stops when no changes.',
                                            'type': 'boolean'}
 
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
         logger = logging.getLogger(name=config.operator_name)
 
 

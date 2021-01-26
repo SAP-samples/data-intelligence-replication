@@ -27,8 +27,6 @@
         "num_tables": 10,
         "base_table_name": "REPLICATION.TEST_TABLE"
     },
-    "tags": {
-        "sdi_utils": ""
-    },
+    "tags": {},
     "iconsrc": "repl_create_test_tables.svg"
 }
