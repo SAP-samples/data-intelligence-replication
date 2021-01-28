@@ -108,7 +108,11 @@ def process(msg) :
     repl_table = df_tables.iloc[pointer]
 
     att['replication_table'] = repl_table['TABLE_NAME']
-    att['checksum_col'] = repl_table['CHECKSUM_COL']
+    if 'CHECKSUM_COL' in repl_table :
+        att['checksum_col'] = repl_table['CHECKSUM_COL']
+    if 'SLICE_PERIOD' in repl_table :
+        att['slice_period'] = repl_table['SLICE_PERIOD']
+
     # split table from schema
     if '.' in repl_table['TABLE_NAME']  :
         att['table_name'] = repl_table['TABLE_NAME'].split('.')[1]

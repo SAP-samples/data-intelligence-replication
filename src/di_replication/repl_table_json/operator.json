@@ -15,7 +15,7 @@
             "description": "Logging data"
         },
         {
-            "name": "csv",
+            "name": "json",
             "type": "message.file",
             "description": "Output data as csv"
         },
@@ -26,12 +26,10 @@
         }
     ],
     "config": {
-        "$type": "http://sap.com/vflow/sdi_replication.repl_table_json.configSchema.json",
+        "$type": "http://sap.com/vflow/di_replication.repl_table_json.configSchema.json",
         "script": "file://repl_table_json.py",
-        "debug_mode": true
+        "drop_columns": "None"
     },
-    "tags": {
-        "sdi_utils": ""
-    },
+    "tags": {},
     "iconsrc": "repl_table_json.svg"
 }

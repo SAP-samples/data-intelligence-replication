@@ -7,6 +7,7 @@ import logging
 import io
 import random
 from datetime import datetime, timezone
+import re
 
 try:
     api
@@ -56,6 +57,24 @@ except NameError:
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
         logger = logging.getLogger(name=config.operator_name)
 
+def get_timestampsuffix(frmt) :
+    dt = datetime.utcnow()
+    r = re.match('([YMDH])(\d{1})',frmt)
+    slice = int(r.group(2))
+    if not r :
+        return ''
+    if r.group(1) == 'H' :
+        hour = (int(dt.hour//slice) + 1)*slice
+        return datetime(dt.year,dt.month,dt.day,hour).strftime('%Y%m%d_%H')
+    if r.group(1) == 'D' :
+        day = (int(dt.day//slice) + 1)*slice
+        return datetime(dt.year,dt.month,day).strftime('%Y%m%d')
+    if r.group(1) == 'M' :
+        month = (int(dt.month//slice) + 1)*slice
+        return datetime(dt.year,month,dt.day).strftime('%Y%m')
+    if r.group(1) == 'Y' :
+        year = (int(dt.year//slice) + 1)*slice
+        return datetime(year,dt.month,dt.day).strftime('%Y')
 
 
 # catching logger messages for separate output
@@ -86,6 +105,9 @@ def process(msg):
     api.logger.info('Replication table from attributes: {} {}'.format(att['schema_name'],att['table_name']))
 
     att['pid'] = int(datetime.utcnow().timestamp()) * 1000 + random.randint(0,1000)
+
+    if 'slice_period' in att :
+        att['timestamp_suffix'] = get_timestampsuffix(att['slice_period'])
 
     wheresnippet = " \"DIREPL_STATUS\" = \'W\' AND ("
     if att['insert_type'] :

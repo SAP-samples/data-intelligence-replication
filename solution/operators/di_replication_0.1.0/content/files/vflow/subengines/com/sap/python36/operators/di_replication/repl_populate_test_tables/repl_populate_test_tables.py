@@ -118,7 +118,7 @@ inports = [{'name': 'data', 'type': 'message.table', "description": "Input data"
 outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
             {'name': 'table', 'type': 'message.table', "description": "msg with table"}]
 
-#api.set_port_callback(inports[0]['name'], process)
+api.set_port_callback(inports[0]['name'], process)
 
 def test_operator():
     att_dict = {'sql':'CREATE','message.batchIndex':1,'message.lastBatch':False,'sql':'CREATE','table_name':'REPLICATION.TEST_TABLE_0'}
@@ -145,13 +145,4 @@ def test_operator():
         print(st.body)
 
 
-
-if __name__ == '__main__':
-    test_operator()
-    if True:
-        subprocess.run(["rm", '-r','./solution/operators/di_replication_' + api.config.version])
-        gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-        solution_name = api.config.operator_name + '_' + api.config.version
-        subprocess.run(["vctl", "solution", "bundle",'./solution/operators/di_replication_' + api.config.version, "-t", solution_name])
-        subprocess.run(["mv", solution_name + '.zip', './solution/operators'])
 
