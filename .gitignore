@@ -13,6 +13,7 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+solution/di_replication*/
 deprecated/
 .Python
 build/
