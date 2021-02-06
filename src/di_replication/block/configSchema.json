@@ -1,0 +1,23 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "http://sap.com/vflow/di_replication.block.configSchema.json",
+    "type": "object",
+    "properties": {
+        "codelanguage": {
+            "type": "string"
+        },
+        "script": {
+            "type": "string"
+        },
+        "package_size": {
+            "title": "Package size",
+            "description": "Defining the package size that should be picked for replication. This is not used together with 'Pacakge ID'",
+            "type": "integer"
+        },
+        "change_types": {
+            "title": "Insert ('I'), update ('U'), delete ('D')",
+            "description": "Insert ('I'), update ('U'), delete ('D')",
+            "type": "string"
+        }
+    }
+}

@@ -1,0 +1,18 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "http://sap.com/vflow/di_replication.populate_test_tables.configSchema.json",
+    "type": "object",
+    "properties": {
+        "codelanguage": {
+            "type": "string"
+        },
+        "script": {
+            "type": "string"
+        },
+        "num_rows": {
+            "title": "Number of table rows",
+            "description": "Number of table rows",
+            "type": "integer"
+        }
+    }
+}

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <g transform="matrix(0.877461, 0, 0, 0.944914, -8.23245, 45.975311)" style="">
+    <g transform="matrix(0.824529, 0, 0, 0.824808, -114.567192, 0.045964)" style="">
+      <rect x="171.295" y="93.931" width="315.533" height="369.394" style="fill: rgb(216, 216, 216); stroke-width: 11px; stroke: rgb(90, 90, 90);"/>
+      <line style="stroke-width: 10px; stroke: rgb(245, 161, 40);" x1="205.92" y1="150.838" x2="444.689" y2="150.623"/>
+      <line style="stroke: rgb(86, 85, 85); stroke-width: 10px; fill: rgb(221, 0, 0);" x1="205.696" y1="254.79" x2="444.465" y2="254.575"/>
+      <line style="stroke-width: 10px; fill: rgb(186, 218, 85); stroke: rgb(245, 161, 40);" x1="205.697" y1="202.814" x2="444.465" y2="202.598"/>
+      <line style="stroke-width: 10px; stroke: rgb(245, 161, 40);" x1="205.92" y1="306.765" x2="444.689" y2="306.55"/>
+      <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="205.92" y1="358.74" x2="444.689" y2="358.528"/>
+      <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="205.697" y1="410.717" x2="444.465" y2="410.503"/>
+    </g>
+    <line style="stroke-width: 8px; stroke: rgb(172, 172, 172);" x1="55.259" y1="124.226" x2="252.425" y2="124.226"/>
+    <line style="stroke-width: 8px; stroke: rgb(172, 172, 172);" x1="55.259" y1="167.199" x2="252.425" y2="167.199"/>
+    <line style="stroke-width: 8px; stroke: rgb(172, 172, 172);" x1="55.259" y1="253.343" x2="252.425" y2="253.343"/>
+  </g>
+  <g transform="matrix(0.885976, 0, 0, 0.90812, 3.42311, -4.138159)" style="">
+    <rect x="334.746" y="77.521" width="201.33" height="147.271" style="fill: rgb(216, 216, 216); stroke-width: 8px; stroke: rgb(92, 92, 92);"/>
+    <line style="stroke-width: 8px; stroke: rgb(245, 161, 40);" x1="359.79" y1="119.226" x2="510.499" y2="119.226"/>
+    <line style="stroke-width: 8px; stroke: rgb(245, 161, 40);" x1="359.79" y1="151.678" x2="510.499" y2="151.678"/>
+    <line style="stroke-width: 8px; stroke: rgb(245, 161, 40);" x1="359.79" y1="185.004" x2="510.499" y2="185.004"/>
+  </g>
+  <path d="M 346.354 269.263 H 418.904 L 418.904 257.763 L 453.904 287.763 L 418.904 317.763 L 418.904 306.263 H 346.354 V 269.263 Z" style="fill: rgb(245, 161, 40);" transform="matrix(0.876185, -0.481975, 0.481975, 0.876185, -160.73941, 213.64595)"/>
+</svg>

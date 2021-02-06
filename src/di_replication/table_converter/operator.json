@@ -1,0 +1,39 @@
+{
+    "description": "table converter",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "data",
+            "type": "message.table",
+            "description": "Input message with table"
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "output",
+            "type": "message.file",
+            "description": "Output data"
+        },
+        {
+            "name": "error",
+            "type": "message.table",
+            "description": "Error status"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/di_replication.table_converter.configSchema.json",
+        "script": "file://table_converter.py",
+        "drop_columns": "None",
+        "target_format": "JSON",
+        "drop_header": false,
+        "only_header": false,
+        "sort_columns": false
+    },
+    "tags": {},
+    "iconsrc": "table_converter.svg"
+}

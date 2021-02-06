@@ -1,0 +1,38 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "http://sap.com/vflow/di_replication.table_converter.configSchema.json",
+    "type": "object",
+    "properties": {
+        "codelanguage": {
+            "type": "string"
+        },
+        "script": {
+            "type": "string"
+        },
+        "drop_columns": {
+            "title": "Drop Columns",
+            "description": "List of columns to drop.",
+            "type": "string"
+        },
+        "target_format": {
+            "title": "Target Format",
+            "description": "Target Format (JSON,CSV)",
+            "type": "string"
+        },
+        "drop_header": {
+            "title": "Drop header",
+            "description": "Drop header (not only for the first run).",
+            "type": "boolean"
+        },
+        "only_header": {
+            "title": "Only header",
+            "description": "Only header (for preparation purpose).",
+            "type": "boolean"
+        },
+        "sort_columns": {
+            "title": "Sort Columns",
+            "description": "Sort columns lexigraphically",
+            "type": "boolean"
+        }
+    }
+}

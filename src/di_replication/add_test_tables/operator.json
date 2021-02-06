@@ -1,0 +1,30 @@
+{
+    "description": "Add Test Tables to Repository Table",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "data",
+            "type": "message.table",
+            "description": "Input data"
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "data",
+            "type": "message.table",
+            "description": "data"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/di_replication.add_test_tables.configSchema.json",
+        "script": "file://add_test_tables.py",
+        "table_repos": "REPLICATION.TABLE_REPOSITORY"
+    },
+    "tags": {},
+    "iconsrc": "add_test_tables.svg"
+}
