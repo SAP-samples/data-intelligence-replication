@@ -21,8 +21,8 @@
         }
     ],
     "config": {
-        "$type": "http://sap.com/vflow/di_replication.repl_select.configSchema.json",
-        "script": "file://select.py"
+        "$type": "http://sap.com/vflow/di_replication.selectdata.configSchema.json",
+        "script": "file://selectdata.py"
     },
     "tags": {},
     "iconsrc": "select.svg"

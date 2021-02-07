@@ -27,7 +27,7 @@ except NameError:
             config_params = dict()
             version = '0.1.0'
             tags = {}
-            operator_name = 'select'
+            operator_name = 'selectdata'
             operator_description = "Select"
 
             operator_description_long = "Creates SELECT SQL-statement for replication."
@@ -50,7 +50,7 @@ api.logger.addHandler(sh)
 def process(msg):
 
     att = dict(msg.attributes)
-    att['operator'] = 'select'
+    att['operator'] = 'selectdata'
 
     api.logger.info("Process started")
     api.logger.debug('Attributes: {} - {}'.format(str(msg.attributes),str(att)))

@@ -72,9 +72,20 @@ def test_operator():
 if __name__ == '__main__':
     test_operator()
     if True :
-        subprocess.run(["rm", '-r','./solution/operators/di_replication_' + api.config.version])
-        api.logger.info('create solution')
+        basename = os.path.basename(__file__[:-3])
+        package_name = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
+        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        solution_name = '{}_{}.zip'.format(basename, api.config.version)
+        package_name_ver = '{}_{}'.format(package_name, api.config.version)
+
+        solution_dir = os.path.join(project_dir, 'solution/operators', package_name_ver)
+        solution_file = os.path.join(project_dir, 'solution/operators', solution_name)
+
+        # rm solution directory
+        subprocess.run(["rm", '-r', solution_dir])
+
+        # create solution directory with generated operator files
         gs.gensolution(os.path.realpath(__file__), api.config, inports, outports)
-        solution_name = api.config.operator_name + '_' + api.config.version
-        subprocess.run(["vctl", "solution", "bundle",'./solution/operators/di_replication_' + api.config.version, "-t", solution_name])
-        subprocess.run(["mv", solution_name + '.zip', './solution/operators'])
+
+        # Bundle solution directory with generated operator files
+        subprocess.run(["vctl", "solution", "bundle", solution_dir, "-t", solution_file])
