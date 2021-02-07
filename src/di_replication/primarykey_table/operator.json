@@ -1,0 +1,30 @@
+{
+    "description": "Primary key SQL",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "filename",
+            "type": "message.file",
+            "description": "filename"
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string",
+            "description": "Logging data"
+        },
+        {
+            "name": "sqlkeys",
+            "type": "message",
+            "description": "sql keys"
+        }
+    ],
+    "config": {
+        "$type": "http://sap.com/vflow/di_replication.primarykey_table.configSchema.json",
+        "script": "file://primarykey_table.py",
+        "schema": "SCHEMA"
+    },
+    "tags": {},
+    "iconsrc": "primarykey_table.svg"
+}

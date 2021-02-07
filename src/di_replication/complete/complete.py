@@ -28,7 +28,7 @@ except NameError:
             version = '0.0.1'
             tags = {}
             operator_name = 'complete'
-            operator_description = "Repl. Complete"
+            operator_description = "Complete"
 
             operator_description_long = "Update replication table status to complete."
             add_readme = dict()

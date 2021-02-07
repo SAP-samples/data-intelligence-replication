@@ -37,13 +37,13 @@ except NameError:
             add_readme = dict()
             add_readme["References"] = ""
 
-            package_size = False
+            package_size = 10
             config_params['package_size'] = {'title': 'Package size',
                                            'description': 'Defining the package size that should be picked for replication. '
                                             'This is not used together with \'Pacakge ID\'',
                                            'type': 'integer'}
 
-            change_types = 'UD'
+            change_types = 'UDI'
             config_params['change_types'] = {'title': 'Insert (\'I\'), update (\'U\'), delete (\'D\')' ,
                                        'description': 'Insert (\'I\'), update (\'U\'), delete (\'D\')',
                                        'type': 'string'}

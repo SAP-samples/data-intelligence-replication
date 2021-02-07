@@ -9,14 +9,24 @@
         "script": {
             "type": "string"
         },
-        "num_tables": {
-            "title": "Number of tables",
-            "description": "Number of tables.",
+        "base_tablename": {
+            "title": "Base Tablename",
+            "description": "Base tablename.",
+            "type": "string"
+        },
+        "num_new_tables": {
+            "title": "Number of new tables",
+            "description": "Number of new tables.",
             "type": "integer"
         },
-        "base_table_name": {
-            "title": "Base Table Name",
-            "description": "Base Table Name.",
+        "num_drop_tables": {
+            "title": "Number of existing tables to drop",
+            "description": "Number of existing tables to drop.",
+            "type": "integer"
+        },
+        "table_repos": {
+            "title": "Table Repository",
+            "description": "Table Repository",
             "type": "string"
         }
     }

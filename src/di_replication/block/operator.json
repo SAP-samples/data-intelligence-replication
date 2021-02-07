@@ -23,8 +23,8 @@
     "config": {
         "$type": "http://sap.com/vflow/di_replication.block.configSchema.json",
         "script": "file://block.py",
-        "package_size": false,
-        "change_types": "UD"
+        "package_size": 10,
+        "change_types": "UDI"
     },
     "tags": {},
     "iconsrc": "block.svg"

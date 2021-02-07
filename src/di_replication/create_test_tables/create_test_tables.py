@@ -17,7 +17,6 @@ except NameError:
     class api:
 
         sql_queue = list()
-        csv_queue = list()
 
         class Message:
             def __init__(self, body=None, attributes=""):
@@ -41,15 +40,26 @@ except NameError:
             add_readme = dict()
             add_readme["References"] = ""
 
-            num_tables = 10
-            config_params['num_tables'] = {'title': 'Number of tables',
-                                           'description': 'Number of tables.',
+
+            base_tablename = 'REPLICATION.TEST_TABLE_'
+            config_params['base_tablename'] = {'title': 'Base Tablename',
+                                           'description': 'Base tablename.',
+                                           'type': 'string'}
+            num_new_tables = 5
+            config_params['num_new_tables'] = {'title': 'Number of new tables',
+                                           'description': 'Number of new tables.',
                                            'type': 'integer'}
 
-            base_table_name = 'REPLICATION.TEST_TABLE'
-            config_params['base_table_name'] = {'title': 'Base Table Name',
-                                           'description': 'Base Table Name.',
+            num_drop_tables = 5
+            config_params['num_drop_tables'] = {'title': 'Number of existing tables to drop',
+                                           'description': 'Number of existing tables to drop.',
+                                           'type': 'integer'}
+
+            table_repos = 'REPLICATION.TABLE_REPOS_BASIC'
+            config_params['table_repos'] = {'title': 'Table Repository',
+                                           'description': 'Table Repository',
                                            'type': 'string'}
+
 
         logger = logging.getLogger(name=config.operator_name)
 
@@ -62,45 +72,81 @@ api.logger.addHandler(sh)
 def process():
 
     operator_name = 'create_test_tables'
-    #logger, log_stream = slog.set_logging(operator_name, loglevel=api.config.debug_mode)
 
-    api.logger.info("Process started. Logging level: {}".format(api.logger.level))
+    # DROP TABLES
+    for i in range(0, api.config.num_drop_tables):
 
-    for i in range (0,api.config.num_tables) :
+        table_name = api.config.base_tablename + '_' + str(i)
+        sql = "DROP TABLE {table}".format(table = table_name)
+        att = {"table_name": table_name,
+               'message.batchIndex': i,
+               'message.lastBatch': False,
+               'sql': sql,
+               'table_basename': api.config.base_tablename,
+               'num_new_tables': api.config.num_new_tables}
+        api.logger.info("Drop table: {}".format(sql))
 
-        table_name = api.config.base_table_name + '_' + str(i)
-        lastbatch = False if not i == api.config.num_tables - 1 else True
-
-        ### DROP
-
-        att_drop = {'table':{'name':table_name},'message.batchIndex':i,'message.lastBatch':lastbatch,'sql':'DROP'}
-        api.logger.info("Drop table:")
-        drop_sql = "DROP TABLE {table}".format(table = table_name)
-        api.send(outports[1]['name'], api.Message(attributes=att_drop, body=drop_sql))
+        api.send(outports[1]['name'], api.Message(attributes=att, body=sql))
         api.send(outports[0]['name'], log_stream.getvalue())
         log_stream.seek(0)
         log_stream.truncate()
 
-        ### CREATE
+    # CREATE TABLES and add to table repos
+    for i in range (0,api.config.num_new_tables) :
 
-        api.logger.info('Create Table: ')
+        table_name = api.config.base_tablename + '_' + str(i)
+        sql = "CREATE COLUMN TABLE {table} (\"INDEX\" BIGINT , \"NUMBER\" BIGINT,  \"DATETIME\" TIMESTAMP, "\
+              "\"DIREPL_PID\" BIGINT , \"DIREPL_UPDATED\" LONGDATE, " \
+              "\"DIREPL_STATUS\" NVARCHAR(1), \"DIREPL_TYPE\" NVARCHAR(1), " \
+              "PRIMARY KEY (\"INDEX\",\"DIREPL_UPDATED\"));".format(table = table_name )
+        api.logger.info('Create Table: {}'.format(sql))
+        att = {"table_name": table_name,
+               'message.batchIndex': i,
+               'message.lastBatch': False,
+               'sql': sql,
+               'table_basename': api.config.base_tablename,
+               'num_new_tables': api.config.num_new_tables}
 
-        create_sql = "CREATE COLUMN TABLE {table} (\"INDEX\" BIGINT , \"NUMBER\" BIGINT,  \"DATETIME\" TIMESTAMP,\
-         \"DIREPL_PID\" BIGINT , \"DIREPL_UPDATED\" LONGDATE, " \
-                     "\"DIREPL_STATUS\" NVARCHAR(1), \"DIREPL_TYPE\" NVARCHAR(1), " \
-                     "PRIMARY KEY (\"INDEX\",\"DIREPL_UPDATED\"));".format(table = table_name )
-
-        att_create = {"table_name":table_name,'message.batchIndex':i,'message.lastBatch':lastbatch,'sql':create_sql}
-        api.send(outports[1]['name'], api.Message(attributes=att_create, body=create_sql))
+        api.send(outports[1]['name'], api.Message(attributes=att, body=sql))
         api.send(outports[0]['name'], log_stream.getvalue())
         log_stream.seek(0)
         log_stream.truncate()
 
-    api.logger.debug('Process ended')
-    api.send(outports[0]['name'], log_stream.getvalue())
+
+    #TRUNCATE TABLE REPOS
+    sql = 'TRUNCATE TABLE {}'.format(api.config.table_repos)
+    api.logger.info('TRUNCATE Table REPOSITORY: {}'.format(sql))
+    att = {"table_name": table_name,
+           'message.batchIndex': i,
+           'message.lastBatch': False,
+           'sql': sql,
+           'table_basename': api.config.base_tablename,
+           'num_new_tables': api.config.num_new_tables}
+    api.send(outports[1]['name'], api.Message(attributes=att, body=sql))
 
 
-inports = [{'name': 'dummy', 'type': 'message.table', "description": "Input data"}]
+    # ADD TABLES to Table Repository
+    for i in range (0,api.config.num_new_tables) :
+        lastbatch = False if not i == api.config.num_new_tables - 1 else True
+
+        table_name = api.config.base_tablename + '_' + str(i)
+        sql = "INSERT INTO {} VALUES(\'{}\',\'H1\')".format(api.config.table_repos,table_name)
+        api.logger.info('INSERT Table into Table Repository: {}'.format(sql))
+        att = {"table_name": table_name,
+               'message.batchIndex': i,
+               'message.lastBatch': lastbatch,
+               'sql': sql,
+               'table_basename': api.config.base_tablename,
+               'num_new_tables': api.config.num_new_tables}
+
+        api.send(outports[1]['name'], api.Message(attributes=att, body=sql))
+        api.send(outports[0]['name'], log_stream.getvalue())
+        log_stream.seek(0)
+        log_stream.truncate()
+
+
+
+inports = [{'name': 'input', 'type': 'message', "description": "Input data"}]
 outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
             {'name': 'sql', 'type': 'message', "description": "msg with sql"}]
 
@@ -109,16 +155,13 @@ outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
 def test_operator():
     api.config.off_set = 2
     api.config.num_rows = 10
-    msg = api.Message(attributes={'packageid':4711,'replication_table':'repl_table'},body='')
+    msg = api.Message(attributes={'table_name':'repl_table'},body='')
     process()
-
 
     for st in api.sql_queue :
         print(st.attributes)
         print(st.body)
 
-    for st in api.csv_queue :
-        print(st.body)
 
 
 if __name__ == '__main__':
