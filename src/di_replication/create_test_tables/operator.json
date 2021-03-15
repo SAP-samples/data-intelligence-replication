@@ -23,10 +23,10 @@
     "config": {
         "$type": "http://sap.com/vflow/di_replication.create_test_tables.configSchema.json",
         "script": "file://create_test_tables.py",
-        "base_tablename": "REPLICATION.TEST_TABLE",
+        "base_tablename": "REPLICATION.TEST_TABLE_",
         "num_new_tables": 5,
         "num_drop_tables": 5,
-        "table_repos": "REPLICATION.TABLE_REPOS"
+        "table_repos": "REPLICATION.TABLE_REPOS_BASIC"
     },
     "tags": {},
     "iconsrc": "create_test_tables.svg"

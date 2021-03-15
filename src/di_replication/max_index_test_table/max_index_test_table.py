@@ -49,7 +49,8 @@ def process(msg):
     att = dict(msg.attributes)
     operator_name = 'repl_max_index_test_tables'
 
-    sql = 'SELECT MAX("INDEX") FROM {table}'.format(table = att['replication_table'])
+    table_name = att['schema_name'] + '.' + att['table_name']
+    sql = 'SELECT MAX("INDEX") FROM {table}'.format(table = table_name)
 
     api.logger.info('SQL statement: {}'.format(sql))
     att['sql'] = sql
@@ -67,7 +68,7 @@ outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
 def test_operator():
     api.config.off_set = 2
     api.config.num_rows = 10
-    msg = api.Message(attributes={'packageid':4711,'replication_table':'repl_table'},body='')
+    msg = api.Message(attributes={'packageid':4711,'table_name':'TEST_TABLE_0','schema_name':'REPLICATION'},body='')
     process(msg)
 
 

@@ -12,11 +12,6 @@
         "package_size": {
             "title": "Package size",
             "description": "Defining the package size that should be picked for replication. This is not used together with 'Pacakge ID'",
-            "type": "integer"
-        },
-        "change_types": {
-            "title": "Insert ('I'), update ('U'), delete ('D')",
-            "description": "Insert ('I'), update ('U'), delete ('D')",
             "type": "string"
         }
     }

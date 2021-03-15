@@ -1,13 +1,10 @@
 import sdi_utils.gensolution as gs
-import os
 import subprocess
 
-
+import os
 import logging
 import io
-import random
-from datetime import datetime, timezone
-import re
+
 
 try:
     api
@@ -28,26 +25,41 @@ except NameError:
         class config:
             ## Meta data
             config_params = dict()
-            version = '0.1.0'
+            version = '0.0.1'
             tags = {}
-            operator_name = 'block'
-            operator_description = "Block"
+            operator_name = 'resetPID'
+            operator_description = "Reset PID"
 
-            operator_description_long = "Update replication table status to done."
+            operator_description_long = "Resets all DIREPL_STATUS = \'W\' for given PIDs."
             add_readme = dict()
             add_readme["References"] = ""
 
-            package_size = '10'
-            config_params['package_size'] = {'title': 'Package size',
-                                           'description': 'Defining the package size that should be picked for replication. '
-                                            'This is not used together with \'Pacakge ID\'',
-                                           'type': 'string'}
+            reset_all = False
+            config_params['reset_all'] = {'title': 'Reset All', \
+                                          'description':'Resets all records to DIREPL_STATUS = \'W\'',\
+                                          'type': 'boolean'}
+
+            pid_list = ''
+            config_params['pid_list'] = {'title': 'PID List', \
+                                          'description':'List of PIDs to reset.',\
+                                          'type': 'string'}
 
 
         format = '%(asctime)s |  %(levelname)s | %(name)s | %(message)s'
-        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+        logging.basicConfig(level=logging.DEBUG, format=format, datefmt='%H:%M:%S')
         logger = logging.getLogger(name=config.operator_name)
 
+
+def read_list(text):
+
+    result_list = list()
+    #elem_list = text.split(sep)
+    elem_list = text.split(',')
+    for x in  elem_list:
+        elem = int(x.strip())
+        result_list.append(elem)
+
+    return result_list
 
 # catching logger messages for separate output
 log_stream = io.StringIO()
@@ -57,49 +69,44 @@ api.logger.addHandler(sh)
 
 
 def process(msg):
+
     att = dict(msg.attributes)
-    att['operator'] = 'block'
+    att['operator'] = 'resetPID'
 
-    # Create transaction id
-    att['pid'] = int(datetime.utcnow().timestamp() * 1000000)
+    if api.config.reset_all :
+        sql = 'UPDATE {table} SET \"DIREPL_STATUS\" = \'W\'; '
 
-    package_size = int(api.config.package_size)
-
-    # SQL Statement
-    table = att['schema_name'] + '.' + att['table_name']
-    if package_size > 0:
-        sql = 'UPDATE TOP {packagesize} {table} SET \"DIREPL_STATUS\" = \'B\', \"DIREPL_PID\" = {pid} ' \
-              'WHERE  \"DIREPL_STATUS\" = \'W\' OR \"DIREPL_STATUS\" IS NULL '.format(packagesize=package_size, table=table, pid=att['pid'])
-    else:
-        sql = 'UPDATE {table} SET \"DIREPL_STATUS\" = \'B\', \"DIREPL_PID\" = {pid} ' \
-              'WHERE  \"DIREPL_STATUS\" = \'W\' OR \"DIREPL_STATUS\" IS NULL '.format(table=table, pid = att['pid'])
+    pid_list = read_list(api.config.pid_list)
+    pid_where_list  = ' OR '.join(['DIREPL_PID = \'{}\''.format(i) for i in pid_list])
+    sql = 'UPDATE {table} SET \"DIREPL_STATUS\" = \'W\' WHERE  {pid} ;'. \
+        format(table=att['replication_table'], pid=pid_where_list)
 
     api.logger.info('Update statement: {}'.format(sql))
+    att['sql'] = sql
 
-    # Send sql to data
-    api.send(outports[1]['name'], api.Message(attributes=att, body=sql))
+    #api.send(outports[1]['name'], update_sql)
+    api.send(outports[1]['name'], api.Message(attributes=att,body=sql))
 
-    # Send logging to log-port
-    api.send(outports[0]['name'], log_stream.getvalue())
+    api.send(outports[0]['name'], log_stream.getvalue() )
     log_stream.seek(0)
-    log_stream.truncate()
 
 
-inports = [{'name': 'data', 'type': 'message', "description": "Input data"}]
+inports = [{'name': 'data', 'type': 'message.file', "description": "Input data"}]
 outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
             {'name': 'msg', 'type': 'message', "description": "msg with sql statement"}]
 
 #api.set_port_callback(inports[0]['name'], process)
 
 def test_operator():
-    #api.config.package_size = 100
-    msg = api.Message(attributes={'packageid':4711,'table_name':'repl_table','schema_name':'schema',\
-                                  'data_outcome':True},body='')
+
+    msg = api.Message(attributes={'pid': 123123213, 'table':'REPL_TABLE','base_table':'REPL_TABLE','latency':30,\
+                                  'replication_table':'repl_table', 'data_outcome':True,'packageid':1},body='')
+
+    api.config.pid_list = '123, 234, 642, 984'
     process(msg)
 
-    for msg in api.queue :
-        print(msg.attributes)
-        print(msg.body)
+    for st in api.queue :
+        print(st)
 
 
 if __name__ == '__main__':

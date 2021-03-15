@@ -44,30 +44,27 @@ except NameError:
 # catching logger messages for separate output
 log_stream = io.StringIO()
 sh = logging.StreamHandler(stream=log_stream)
-sh.setFormatter(logging.Formatter('%(asctime)s |  %(levelname)s | %(name)s | %(message)s', datefmt='%H:%M:%S'))
+sh.setFormatter(logging.Formatter('%(asctime)s : %(levelname)s : %(name)s : %(message)s', datefmt='%H:%M:%S'))
 api.logger.addHandler(sh)
 
 def process(msg):
 
     att = dict(msg.attributes)
     att['operator'] = 'selectdata'
+    table = att['schema_name'] + '.' + att['table_name']
 
-    api.logger.info("Process started")
-    api.logger.debug('Attributes: {} - {}'.format(str(msg.attributes),str(att)))
-
+    # Create SQL-statement
     sql = 'SELECT * FROM {table} WHERE \"DIREPL_STATUS\" = \'B\' AND  \"DIREPL_PID\" = \'{pid}\' '.\
-        format(table=att['replication_table'],pid= att['pid'])
-    att['sql'] = sql
-    msg = api.Message(attributes=att,body = sql)
-
+        format(table=table,pid= att['pid'])
     api.logger.info('SELECT statement: {}'.format(sql))
 
-    api.send(outports[1]['name'], msg)
+    # Send to data-outport
+    api.send(outports[1]['name'], api.Message(attributes=att,body = sql))
 
-    log = log_stream.getvalue()
-    if len(log) > 0 :
-        api.send(outports[0]['name'], log )
-
+    # Send to log-outport
+    api.send(outports[0]['name'], log_stream.getvalue() )
+    log_stream.seek(0)
+    log_stream.truncate()
 
 inports = [{'name': 'trigger', 'type': 'message.table', "description": "Input data"}]
 outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
@@ -77,7 +74,7 @@ outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
 
 def test_operator():
 
-    msg = api.Message(attributes={'pid': 123123213, 'replication_table':'REPL_TABLE','base_table':'REPL_TABLE','latency':30,'data_outcome':True},body='')
+    msg = api.Message(attributes={'pid': 123123213, 'table_name':'REPL_TABLE','schema_name':'SCHEMA','latency':30,'data_outcome':True},body='')
     process(msg)
 
     for m in api.queue:

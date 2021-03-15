@@ -179,7 +179,7 @@ def process(msg):
 
     if df.shape[0] == 0 :
         att['data_outcome'] = False
-        api.send(outports[2]['name'], api.Message(attributes=att, body=att['data_outcome']))
+        api.send(outports[2]['name'], api.Message(attributes=att, body=None))
         api.logger.info('No data received, msg to port error_status sent.')
         api.send(outports[0]['name'], log_stream.getvalue())
         log_stream.seek(0)

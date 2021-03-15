@@ -10,8 +10,8 @@
             "type": "string"
         },
         "mode": {
-            "title": "Mode: (F)or-Loop, (C)onditional or (I)ndefinite",
-            "description": "Mode: ('F'or, 'C'onditional or 'I'indefinite.",
+            "title": "Mode: (F)or-Loop, (C)onditional, (R)emove or (I)ndefinite",
+            "description": "Mode: ('F'or, 'C'onditional ('R')emove or 'I'indefinite.",
             "type": "string"
         }
     }

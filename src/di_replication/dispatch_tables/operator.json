@@ -8,8 +8,13 @@
             "description": "List of tables"
         },
         {
-            "name": "trigger",
+            "name": "data",
             "type": "message.*",
+            "description": "Trigger"
+        },
+        {
+            "name": "nodata",
+            "type": "message",
             "description": "Trigger"
         }
     ],
@@ -33,7 +38,7 @@
     "config": {
         "$type": "http://sap.com/vflow/di_replication.dispatch_tables.configSchema.json",
         "script": "file://dispatch_tables.py",
-        "mode": "F"
+        "mode": "R"
     },
     "tags": {},
     "iconsrc": "dispatch_tables.svg"

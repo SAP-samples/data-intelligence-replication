@@ -130,7 +130,7 @@ def process():
         lastbatch = False if not i == api.config.num_new_tables - 1 else True
 
         table_name = api.config.base_tablename + '_' + str(i)
-        sql = "INSERT INTO {} VALUES(\'{}\',\'H1\')".format(api.config.table_repos,table_name)
+        sql = "INSERT INTO {} VALUES(\'{}\')".format(api.config.table_repos,table_name)
         api.logger.info('INSERT Table into Table Repository: {}'.format(sql))
         att = {"table_name": table_name,
                'message.batchIndex': i,

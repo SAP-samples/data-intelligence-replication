@@ -66,8 +66,6 @@ def process(msg):
         df = pd.DataFrame(col1, columns=['NUMBER']).reset_index()
         df.rename(columns={'index': 'INDEX'}, inplace=True)
         df['DIREPL_UPDATED'] = datetime.now(timezone.utc).isoformat()
-        df['DIREPL_PID'] = 0
-        df['DIREPL_STATUS'] = 'W'
         df['DIREPL_TYPE'] = 'I'
         df['NUM_MOD'] = df['NUMBER']%100
         df['DATETIME'] = datetime.now(timezone.utc) - pd.to_timedelta(df['NUM_MOD'],unit='d')
@@ -78,15 +76,20 @@ def process(msg):
             "columns": [{"class": "integer", "name": "INDEX", "nullable": False, "type": {"hana": "BIGINT"}}, \
                         {"class": "integer", "name": "NUMBER", "nullable": True, "type": {"hana": "BIGINT"}},
                         {"class": "timestamp", "name": "DATETIME", "nullable": False, "type": {"hana": "TIMESTAMP"}}, \
-                        {"class": "integer", "name": "DIREPL_PID", "nullable": True, "type": {"hana": "BIGINT"}}, \
+                        #{"class": "integer", "name": "DIREPL_PID", "nullable": True, "type": {"hana": "BIGINT"}}, \
                         {"class": "timestamp", "name": "DIREPL_UPDATED", "nullable": True, "type": {"hana": "TIMESTAMP"}}, \
-                        {"class": "string", "name": "DIREPL_STATUS", "nullable": True, "size": 1, "type": {"hana": "NVARCHAR"}}, \
+                        #{"class": "string", "name": "DIREPL_STATUS", "nullable": True, "size": 1, "type": {"hana": "NVARCHAR"}}, \
                         {"class": "string", "name": "DIREPL_TYPE", "nullable": True, "size": 1,"type": {"hana": "NVARCHAR"}}], \
                         "version": 1, "name": att['table_name']}
 
-        df = df[['INDEX', 'NUMBER', 'DATETIME','DIREPL_PID', 'DIREPL_UPDATED', 'DIREPL_STATUS','DIREPL_TYPE']]
+        att['message.batchIndex'] = i
+        att['message.lastBatch'] = False if not i == msg.attributes['num_new_tables'] - 1 else True
+
+        #df = df[['INDEX', 'NUMBER', 'DATETIME','DIREPL_PID', 'DIREPL_UPDATED', 'DIREPL_STATUS','DIREPL_TYPE']]
+        df = df[['INDEX', 'NUMBER', 'DATETIME', 'DIREPL_UPDATED',  'DIREPL_TYPE']]
         table_data = df.values.tolist()
         api.logger.info('Table inserts sent to: {}'.format(att['table_name']))
+        print(table_data)
 
         api.send(outports[1]['name'], api.Message(attributes=att, body=table_data))
         api.send(outports[0]['name'], log_stream.getvalue())
@@ -94,7 +97,7 @@ def process(msg):
         log_stream.truncate()
 
 
-inports = [{'name': 'data', 'type': 'message.table', "description": "Input data"}]
+inports = [{'name': 'data', 'type': 'message', "description": "Input data"}]
 outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
             {'name': 'table', 'type': 'message.table', "description": "msg with table"}]
 
@@ -124,8 +127,6 @@ def test_operator():
     for st in api.queue :
         print(st.attributes)
         print(st.body)
-
-
 
 if __name__ == '__main__':
     test_operator()

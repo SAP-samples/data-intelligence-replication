@@ -1,5 +1,5 @@
 {
-    "description": "Complete",
+    "description": "Reset PID",
     "component": "com.sap.system.python3Operator",
     "inports": [
         {
@@ -21,9 +21,11 @@
         }
     ],
     "config": {
-        "$type": "http://sap.com/vflow/di_replication.complete.configSchema.json",
-        "script": "file://complete.py"
+        "$type": "http://sap.com/vflow/di_replication.resetPID.configSchema.json",
+        "script": "file://resetPID.py",
+        "reset_all": false,
+        "pid_list": "123, 234, 642, 984"
     },
     "tags": {},
-    "iconsrc": "complete.svg"
+    "iconsrc": "resetPID.svg"
 }

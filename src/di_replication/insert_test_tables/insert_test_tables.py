@@ -83,7 +83,7 @@ def process(msg):
     df['DATETIME'] = df['DATETIME'].apply(datetime.isoformat)
     #df['DATE'] = df['DATE'].dt.strftime("%Y-%m-%d")
 
-    table_name = att['replication_table']
+    table_name = att['schema_name'] + '.' + att['table_name']
     att['table'] = {
         "columns": [{"class": "integer", "name": "INDEX", "nullable": False, "type": {"hana": "BIGINT"}}, \
                     {"class": "integer", "name": "NUMBER", "nullable": True, "type": {"hana": "BIGINT"}}, \
@@ -93,7 +93,7 @@ def process(msg):
                     {"class": "datetime", "name": "DIREPL_UPDATED", "nullable": True,"type": {"hana": "TIMESTAMP"}}, \
                     {"class": "string", "name": "DIREPL_STATUS", "nullable": True, "size": 1,"type": {"hana": "NVARCHAR"}}, \
                     {"class": "string", "name": "DIREPL_TYPE", "nullable": True, "size": 1,
-                     "type": {"hana": "NVARCHAR"}}],"version": 1, "name": att['replication_table']}
+                     "type": {"hana": "NVARCHAR"}}],"version": 1, "name": table_name}
     #df = df[['INDEX','NUMBER','DATETIME','DIREPL_PACKAGEID','DIREPL_PID','DIREPL_UPDATED','DIREPL_STATUS','DIREPL_TYPE']]
     df = df[['INDEX', 'NUMBER', 'DATETIME','DIREPL_PID', 'DIREPL_UPDATED', 'DIREPL_STATUS','DIREPL_TYPE']]
 
@@ -102,6 +102,7 @@ def process(msg):
     api.send(outports[1]['name'], api.Message(attributes=att, body=table_data))
     api.send(outports[0]['name'], log_stream.getvalue())
     log_stream.seek(0)
+    log_stream.truncate()
 
 
 inports = [{'name': 'data', 'type': 'message.table', "description": "Input data"}]
@@ -113,7 +114,7 @@ outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
 def test_operator():
     api.config.off_set = 2
     api.config.num_rows = 10
-    msg = api.Message(attributes={'packageid':4711,'replication_table':'REPLICATION.TEST_TABLE_0'},body=[[50]])
+    msg = api.Message(attributes={'packageid':4711,'table_name':'TEST_TABLE_0','schema_name':'REPLICATION'},body=[[50]])
     process(msg)
 
 

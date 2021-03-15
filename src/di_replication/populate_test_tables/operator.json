@@ -4,7 +4,7 @@
     "inports": [
         {
             "name": "data",
-            "type": "message.table",
+            "type": "message",
             "description": "Input data"
         }
     ],
