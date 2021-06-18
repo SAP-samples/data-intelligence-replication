@@ -4,8 +4,11 @@ import io
 import logging
 import os
 import subprocess
+import uuid
 
 import pandas as pd
+import binascii
+
 
 import sdi_utils.gensolution as gs
 
@@ -58,9 +61,28 @@ def on_input(msg):
 
         # Remove columns 'DIREPL_PID', 'DIREPL_STATUS' and create JSON
         header = [c["name"] for c in msg.attributes['table']['columns']]
-        df = pd.DataFrame(msg.body, columns=header).drop(columns=['DIREPL_PID', 'DIREPL_STATUS'])
-
+        df = pd.DataFrame(msg.body, columns=header)
+        df.drop(columns=['DIREPL_PID', 'DIREPL_STATUS'],inplace=True)
         num_records = df.shape[0]
+
+        try :
+            raise OverflowError('TEST')
+            msg.body = df.to_json(orient='records', date_format='%Y%m%d %H:%M:%S')
+        except OverflowError as oe :
+            api.logger.warning('OverflowError: {}'.format(oe))
+            for col in df.select_dtypes(include=['object']).columns:
+                try :
+                    df[col] = df[col].str.encode('utf-8')
+                except (AttributeError, TypeError ) as ate :
+                    api.logger.warning('Exception with column: {} () - (Convert to int))'.format(col,ate))
+                    def b2str(x) :
+                        return  int.from_bytes(x,byteorder='big',signed=False)
+                        #return str(x)
+                        #return binascii.b2a_hex(x)
+                    df[col] = df[col].apply(b2str)
+
+            msg.body = df.to_json(orient='records', date_format='%Y%m%d %H:%M:%S')
+
         msg.body = df.to_json(orient='records', date_format='%Y%m%d %H:%M:%S')
 
         # Send to data-outport
@@ -96,20 +118,52 @@ outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
 
 def test_operator():
 
-    ## table input
-    headers = ["header1","header2","header3","DIREPL_STATUS","DIREPL_PID" ]
-    attributes = {"table":{"columns":[{"class":"string","name":headers[0],"nullable":True,"size":80,"type":{"hana":"NVARCHAR"}},
-                                      {"class":"string","name":headers[1],"nullable":True,"size":3,"type":{"hana":"NVARCHAR"}},
-                                      {"class":"string","name":headers[2],"nullable":True,"size":10,"type":{"hana":"NVARCHAR"}},
-                                      {"class":"string","name":headers[3],"nullable":True,"size":1,"type":{"hana":"NVARCHAR"}},
-                                      {"class":"integer","name":headers[4],"nullable":True,"type":{"hana":"BIGINT"}}],
-                           "name":"test.table","version":1},
-                  'base_table':'TABLE','schema_name':'schema','table_name':'table','message.lastBatch':False}
+    DB = True
+    if not DB :
+        ## table input
+        headers = ["header1","header2","header3","DIREPL_STATUS","DIREPL_PID" ]
+        attributes = {"table":{"columns":[{"class":"string","name":headers[0],"nullable":True,"size":80,"type":{"hana":"NVARCHAR"}},
+                                          {"class":"string","name":headers[1],"nullable":True,"size":3,"type":{"hana":"NVARCHAR"}},
+                                          {"class":"string","name":headers[2],"nullable":True,"size":10,"type":{"hana":"NVARCHAR"}},
+                                          {"class":"string","name":headers[3],"nullable":True,"size":1,"type":{"hana":"NVARCHAR"}},
+                                          {"class":"integer","name":headers[4],"nullable":True,"type":{"hana":"BIGINT"}}],
+                               "name":"test.table","version":1},
+                      'base_table':'TABLE','schema_name':'schema','table_name':'table','message.lastBatch':False}
 
-    table = [[(j * 3 + i) for i in range(0, len(headers))] for j in range(0, 5)]
-    msg = api.Message(attributes=attributes, body=table)
-    on_input(msg)
+        #table = [[(j * 3 + i) for i in range(0, len(headers))] for j in range(0, 5)]
+        table =  [['1','A',b'3425q1','W',123],['2','B',b'3495q1','W',123],['3','c',b'1425q1','W',123]]
+        msg = api.Message(attributes=attributes, body=table)
+        on_input(msg)
 
+    else :
+
+        import yaml
+        from hdbcli import dbapi
+
+        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+
+        with open(os.path.join(project_dir,'config.yaml')) as yamls:
+            params = yaml.safe_load(yamls)
+
+        db = {'host': params['HDB_HOST'],
+              'user': params['HDB_USER'],
+              'pwd': params['HDB_PWD'],
+              'port': params['HDB_PORT']}
+
+        conn = dbapi.connect(address=db['host'], port=db['port'], user=db['user'], password=db['pwd'], encrypt=True,
+                             sslValidateCertificate=False)
+        cursor = conn.cursor()
+        sql = 'SELECT * FROM FKKVKP WHERE DIREPL_STATUS = \'B\';'
+        resp = cursor.execute(sql)
+        table = cursor.fetchall()
+        columns = [{'name':i[0]} for i in cursor.description]  # get column headers
+        attributes = {"table":{"columns":columns,"name":"test.table","version":1},
+                      'base_table':'TABLE','schema_name':'schema','table_name':'table','message.lastBatch':False}
+        cursor.close()
+        conn.close()
+
+        msg = api.Message(attributes=attributes, body=table)
+        on_input(msg)
 
 
 if __name__ == '__main__':

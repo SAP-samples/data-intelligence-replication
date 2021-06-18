@@ -3,8 +3,11 @@
 import io
 import logging
 import os
+import uuid
 
 import pandas as pd
+import binascii
+
 
 
 
@@ -22,9 +25,28 @@ def on_input(msg):
 
         # Remove columns 'DIREPL_PID', 'DIREPL_STATUS' and create JSON
         header = [c["name"] for c in msg.attributes['table']['columns']]
-        df = pd.DataFrame(msg.body, columns=header).drop(columns=['DIREPL_PID', 'DIREPL_STATUS'])
-
+        df = pd.DataFrame(msg.body, columns=header)
+        df.drop(columns=['DIREPL_PID', 'DIREPL_STATUS'],inplace=True)
         num_records = df.shape[0]
+
+        try :
+            #raise OverflowError('TEST')
+            msg.body = df.to_json(orient='records', date_format='%Y%m%d %H:%M:%S')
+        except OverflowError as oe :
+            api.logger.warning('OverflowError: {}'.format(oe))
+            for col in df.select_dtypes(include=['object']).columns:
+                try :
+                    df[col] = df[col].str.encode('utf-8')
+                except (AttributeError, TypeError ) as ate :
+                    api.logger.warning('Exception with column: {} () - (Convert to int))'.format(col,ate))
+                    def b2str(x) :
+                        return  int.from_bytes(x,byteorder='big',signed=False)
+                        #return str(x)
+                        #return binascii.b2a_hex(x)
+                    df[col] = df[col].apply(b2str)
+
+            msg.body = df.to_json(orient='records', date_format='%Y%m%d %H:%M:%S')
+
         msg.body = df.to_json(orient='records', date_format='%Y%m%d %H:%M:%S')
 
         # Send to data-outport
@@ -50,7 +72,7 @@ def on_input(msg):
         log_stream.truncate()
 
 
-inports = [{'name': 'input', 'type': 'message', "description": "data"}]
+inports = [{'name': 'input', 'type': 'message.table', "description": "data"}]
 outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
             {'name': 'output', 'type': 'message.file', "description": "data"},
             {'name': 'nodata', 'type': 'message.file', "description": "no data"}]
