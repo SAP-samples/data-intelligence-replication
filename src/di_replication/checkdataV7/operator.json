@@ -1,0 +1,35 @@
+{
+    "description": "CheckdataV7",
+    "component": "com.sap.system.python3Operator",
+    "versionStatus": "active",
+    "inports": [
+        {
+            "name": "input",
+            "type": "message.table"
+        }
+    ],
+    "outports": [
+        {
+            "name": "log",
+            "type": "string"
+        },
+        {
+            "name": "output",
+            "type": "message.file"
+        },
+        {
+            "name": "nodata",
+            "type": "message.file"
+        }
+    ],
+    "iconsrc": "checkdata.svg",
+    "config": {
+        "$tpye": "http://sap.com/vflow/di_replication.checkdataV7.configSchema.json",
+        "$type": "http://sap.com/vflow/di_replication.checkdataV7.configSchema.json",
+        "codecs": [
+            "utf-8",
+            "cp1250"
+        ],
+        "script": "file://checkdata.py"
+    }
+}

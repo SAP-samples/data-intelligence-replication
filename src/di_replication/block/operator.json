@@ -1,30 +1,27 @@
 {
     "description": "Block",
     "component": "com.sap.system.python3Operator",
+    "versionStatus": "active",
     "inports": [
         {
             "name": "data",
-            "type": "message",
-            "description": "Input data"
+            "type": "message"
         }
     ],
     "outports": [
         {
             "name": "log",
-            "type": "string",
-            "description": "Logging data"
+            "type": "string"
         },
         {
             "name": "msg",
-            "type": "message",
-            "description": "msg with sql statement"
+            "type": "message"
         }
     ],
+    "iconsrc": "block.svg",
     "config": {
         "$type": "http://sap.com/vflow/di_replication.block.configSchema.json",
-        "script": "file://block.py",
-        "package_size": "10"
-    },
-    "tags": {},
-    "iconsrc": "block.svg"
+        "package_size": 10,
+        "script": "file://block.py"
+    }
 }

@@ -1,33 +1,24 @@
 {
     "description": "Create Test Tables",
     "component": "com.sap.system.python3Operator",
-    "inports": [
-        {
-            "name": "input",
-            "type": "message",
-            "description": "Input data"
-        }
-    ],
+    "versionStatus": "active",
     "outports": [
         {
             "name": "log",
-            "type": "string",
-            "description": "Logging data"
+            "type": "string"
         },
         {
             "name": "sql",
-            "type": "message",
-            "description": "msg with sql"
+            "type": "message"
         }
     ],
+    "iconsrc": "create_test_tables.svg",
     "config": {
         "$type": "http://sap.com/vflow/di_replication.create_test_tables.configSchema.json",
-        "script": "file://create_test_tables.py",
-        "base_tablename": "REPLICATION.TEST_TABLE_",
-        "num_new_tables": 5,
+        "base_tablename": "REPLICATION.TEST_TABLE",
         "num_drop_tables": 5,
-        "table_repos": "REPLICATION.TABLE_REPOS_BASIC"
-    },
-    "tags": {},
-    "iconsrc": "create_test_tables.svg"
+        "num_new_tables": 5,
+        "script": "file://create_test_tables.py",
+        "table_repos": "REPLICATION.TABLE_REPOS"
+    }
 }

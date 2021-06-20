@@ -1,45 +1,39 @@
 {
     "description": "Dispatch Tables",
     "component": "com.sap.system.python3Operator",
+    "versionStatus": "active",
     "inports": [
         {
             "name": "tables",
-            "type": "message.table",
-            "description": "List of tables"
+            "type": "message.table"
         },
         {
             "name": "data",
-            "type": "message.*",
-            "description": "Trigger"
+            "type": "message.*"
         },
         {
             "name": "nodata",
-            "type": "message",
-            "description": "Trigger"
+            "type": "message"
         }
     ],
     "outports": [
         {
             "name": "log",
-            "type": "string",
-            "description": "Logging data"
+            "type": "string"
         },
         {
             "name": "trigger",
-            "type": "message",
-            "description": "trigger"
+            "type": "message"
         },
         {
             "name": "limit",
-            "type": "message",
-            "description": "limit"
+            "type": "message"
         }
     ],
+    "iconsrc": "dispatch_tables.svg",
     "config": {
         "$type": "http://sap.com/vflow/di_replication.dispatch_tables.configSchema.json",
-        "script": "file://dispatch_tables.py",
-        "mode": "R"
-    },
-    "tags": {},
-    "iconsrc": "dispatch_tables.svg"
+        "mode": "R",
+        "script": "file://dispatch_tables.py"
+    }
 }

@@ -1,29 +1,26 @@
 {
     "description": "Gate",
     "component": "com.sap.system.python3Operator",
+    "versionStatus": "active",
     "inports": [
         {
             "name": "data",
-            "type": "message.*",
-            "description": "Input data"
+            "type": "message.*"
         }
     ],
     "outports": [
         {
             "name": "log",
-            "type": "string",
-            "description": "Logging data"
+            "type": "string"
         },
         {
             "name": "data",
-            "type": "message",
-            "description": "Output of unchanged last input data"
+            "type": "message"
         }
     ],
+    "iconsrc": "gate.svg",
     "config": {
         "$type": "http://sap.com/vflow/di_replication.gate.configSchema.json",
         "script": "file://gate.py"
-    },
-    "tags": {},
-    "iconsrc": "gate.svg"
+    }
 }
