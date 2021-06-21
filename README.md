@@ -3,6 +3,7 @@
 
   SPDX-License-Identifier: Apache-2.0
 -->
+[![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/data-intelligence-replication)](https://api.reuse.software/info/github.com/SAP-samples/data-intelligence-replication)
 # Replication with SAP Data Intelligence
 
 ## Description

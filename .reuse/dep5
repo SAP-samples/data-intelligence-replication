@@ -3,8 +3,3 @@ Upstream-Name: data-intelligence-replication
 Upstream-Contact: Thorsten Hapke <thorsten.hapke@sap.com>
 Source: github.com/SAP-samples/data-intelligence-replication
 
-# Sample paragraph, commented out:
-#
-# Files: src/*
-# Copyright: $YEAR $NAME <$CONTACT>
-# License: ...
