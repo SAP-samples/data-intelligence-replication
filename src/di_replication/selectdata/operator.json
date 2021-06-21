@@ -4,7 +4,7 @@
     "versionStatus": "active",
     "inports": [
         {
-            "name": "trigger",
+            "name": "input",
             "type": "message.table"
         }
     ],
@@ -14,7 +14,7 @@
             "type": "string"
         },
         {
-            "name": "msg",
+            "name": "output",
             "type": "message"
         }
     ],

@@ -1,7 +1,0 @@
-
-
-###### HANA DB
-HDB_HOST : '559888d5-f0af-4907-ad20-fa4d3876e870.hana.prod-eu10.hanacloud.ondemand.com'
-HDB_USER : XOSERVE
-HDB_PWD : 'Xo4test2Di'
-HDB_PORT : 443

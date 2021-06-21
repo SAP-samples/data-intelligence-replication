@@ -4,9 +4,6 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
-# DI-PYOPERATOR GENERATED - DO NOT CHANGE this line and the following 3 lines (Deleted when uploaded.)
-from utils.mock_di_api import mock_api
-api = mock_api(__file__)
 
 import copy
 from datetime import datetime
@@ -66,7 +63,7 @@ def on_nodata(msg):
         if len(tables) == 0: # No tables in tables-list left
             log('Last Table removed from table-list: {}'.format(removed_table))
             msg = api.Message(attributes=msg.attributes, body='Number of roundtrips: {}'.format(num_roundtrips))
-            api.send('limit', msg)
+            api.send(outports[2]['name'], msg)
             return 0
 
         if pointer == len(tables) :

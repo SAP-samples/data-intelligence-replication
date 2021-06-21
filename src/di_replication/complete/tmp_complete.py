@@ -4,14 +4,11 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
-# DI-PYOPERATOR GENERATED - DO NOT CHANGE this line and the following 3 lines (Deleted when uploaded.)
-from utils.mock_di_api import mock_api
-api = mock_api(__file__)
 
 import copy
 from datetime import datetime
 
-operator_name = 'selectdata'
+operator_name = 'complete'
 
 def log(log_str,level='info') :
     if level == 'debug' :
@@ -26,19 +23,20 @@ def log(log_str,level='info') :
     now = datetime.now().strftime('%H:%M:%S')
     api.send('log','{} | {} | {} | {}'.format(now,level,operator_name,log_str))
 
-
-
 def on_input(msg):
 
     att = copy.deepcopy(msg.attributes)
+
     table = att['schema_name'] + '.' + att['table_name']
 
     # Create SQL-statement
-    sql = 'SELECT * FROM {table} WHERE \"DIREPL_PID\" = \'{pid}\' '.\
-        format(table=table,pid= att['pid'])
-    log('{}'.format(sql))
+    sql = 'UPDATE {table} SET \"DIREPL_STATUS\" = \'C\' WHERE  \"DIREPL_PID\" = {pid}'.\
+        format(table=table, pid = att['pid'])
+
+    log(sql)
 
     # Send to data-outport
-    api.send("output", api.Message(attributes=att,body = sql))
+    api.send('output', api.Message(attributes=att,body=sql))
 
-api.set_port_callback("input", on_input)
+
+api.set_port_callback('input', on_input)

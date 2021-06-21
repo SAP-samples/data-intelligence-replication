@@ -1,11 +1,14 @@
+#
+#  SPDX-FileCopyrightText: 2021 Thorsten Hapke <thorsten.hapke@sap.com>
+#
+#  SPDX-License-Identifier: Apache-2.0
+#
 
 
-import io
-import logging
-import binascii
+
 from datetime import datetime
-import json
 import pandas as pd
+
 
 operator_name = 'checkdata'
 
@@ -24,7 +27,7 @@ def log(log_str,level='info') :
 
 
 def on_input(msg):
-    att = dict(msg.attributes)
+    att = copy.deepcopy(msg.attributes)
 
     ### IF SELECT provided data
     if not msg.body == None:
@@ -53,7 +56,7 @@ def on_input(msg):
                     df[vb] = df[vb].str.decode('utf-8','ignore')
                     decode_successful[vb] = True
                 except :
-                    log('Decode failed completly: \'{}\''.format(vb), 'error')
+                    log('Decode failed completely: \'{}\''.format(vb), 'error')
 
         if len(decode_successful) == 0 or all(v for v in decode_successful.values()) :
             msg.body = df.to_json(orient='records', date_format='%Y%m%d %H:%M:%S')
@@ -81,11 +84,5 @@ def on_input(msg):
         # Send to log-outport
         log("No Data send!")
 
-
-
-inports = [{'name': 'input', 'type': 'message', "description": "data"}]
-outports = [{'name': 'log', 'type': 'string', "description": "Logging data"}, \
-            {'name': 'output', 'type': 'message.file', "description": "data"},
-            {'name': 'nodata', 'type': 'message.file', "description": "no data"}]
 
 api.set_port_callback("input", on_input)

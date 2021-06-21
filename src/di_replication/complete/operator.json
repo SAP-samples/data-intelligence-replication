@@ -4,7 +4,7 @@
     "versionStatus": "active",
     "inports": [
         {
-            "name": "data",
+            "name": "input",
             "type": "message.file"
         }
     ],
@@ -14,7 +14,7 @@
             "type": "string"
         },
         {
-            "name": "msg",
+            "name": "output",
             "type": "message"
         }
     ],

@@ -3,7 +3,9 @@
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/data-intelligence-replication)](https://api.reuse.software/info/github.com/SAP-samples/data-intelligence-replication)
 
 ## Description
+
 ### Introduction
+
 Although replication comes with
 
 * additional  effort due to setting up the processes
@@ -27,14 +29,13 @@ In the following I propose a replication service based on SLT replicating to an 
 ![graph](./images/process.png
 
 
-During the last Months working with customers using the solution it became clear that it only needs to replicate the changes in a JSON format. This simplifies a lot the original solution. For reducing my  maintenance of the solution I will remove all parts that are not essiential and keep only the
+During the last Months working with customers using the solution it became clear that it only needs to replicate the changes in a JSON format. This simplifies a lot the original solution. For reducing my  maintenance of the solution I will remove all parts that are not essential and keep only the
 
 * Test Table Generation pipeline
 * Replication pipeline
 
-)
-
 ### Setup
+
 #### Additional Change Metadata
 
 The staging table needs in addition to the table data also information about the changes. That means that the SLT script has to be adjusted that 2 additional columns are populated:
@@ -70,6 +71,22 @@ Pipeline:
 
 The folder structure of the target object can be setup using the Placeholder-patterns of the Write-File operator. Because a file-hander cannot be shared among separate pipelines the append mode can only be used for each pipeline-file pair. I recommend to write separate files for all changes.
 
+#### Table repository
+
+The Table repository is a simple table that has only one column containing all the tables that should be replicated. You could have multiple table repositories. The repository is passed to the replciation pipeline
+
+SQL code create table:
+
+```
+CREATE COLUMN TABLE "REPLICATION"."TABLE_REPOS"(
+	"TABLE_NAME" NVARCHAR(100),
+	PRIMARY KEY (
+		"TABLE_NAME"
+	)
+)
+```
+
+![graph](./images/replication_process.png)
 
 ### Replication Pipeline
 
@@ -84,7 +101,7 @@ In addition to these there are two other custom operators
 * di_replication.dispatch_tables
 * di_replication.checkdataV7
 
-![graph](./images/replication_process.png)
+![graph](./images/replication_pipeline_2106.png)
 
 #### dispatch_tables
 This operator manages the loop running over all tables of the table repository.

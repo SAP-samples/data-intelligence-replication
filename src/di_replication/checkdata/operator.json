@@ -1,5 +1,5 @@
 {
-    "description": "CheckdataV7",
+    "description": "Checkdata",
     "component": "com.sap.system.python3Operator",
     "versionStatus": "active",
     "inports": [
@@ -19,12 +19,11 @@
         },
         {
             "name": "nodata",
-            "type": "message.file"
+            "type": "message"
         }
     ],
     "iconsrc": "checkdata.svg",
     "config": {
-        "$tpye": "http://sap.com/vflow/di_replication.checkdataV7.configSchema.json",
         "$type": "http://sap.com/vflow/di_replication.checkdataV7.configSchema.json",
         "codecs": [
             "utf-8",
