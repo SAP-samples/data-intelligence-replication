@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  SPDX-FileCopyrightText: 2021 Thorsten Hapke thorsten.hapke@sap.com
+
+  SPDX-License-Identifier: Apache-2.0
+-->
 <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
   <circle style="paint-order: stroke; fill: rgb(231, 172, 59);" cx="278.92" cy="222.503" r="94.956" transform="matrix(1.136505, 0, 0, 1.510419, -33.289387, -80.223564)"/>
   <rect x="106.563" y="112.348" width="182.526" height="287.652" style="paint-order: fill; fill: rgb(231, 172, 59);"/>

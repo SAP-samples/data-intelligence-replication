@@ -1,3 +1,8 @@
+#
+#  SPDX-FileCopyrightText: 2021 Thorsten Hapke thorsten.hapke@sap.com
+#
+#  SPDX-License-Identifier: Apache-2.0
+#
 import gate
 from utils.mock_di_api import mock_api
 from utils.operator_test import operator_test

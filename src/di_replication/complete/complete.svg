@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  SPDX-FileCopyrightText: 2021 Thorsten Hapke thorsten.hapke@sap.com
+
+  SPDX-License-Identifier: Apache-2.0
+-->
 <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
   <rect x="75.22" y="93.931" width="227.283" height="283.808" style="fill: rgb(216, 216, 216); stroke-width: 11px; stroke: rgb(90, 90, 90);"/>
   <line style="stroke: rgb(86, 85, 85); stroke-width: 10px;" x1="75.22" y1="137.653" x2="302.716" y2="137.488"/>

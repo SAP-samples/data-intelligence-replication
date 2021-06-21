@@ -1,3 +1,8 @@
+<!--
+  SPDX-FileCopyrightText: 2021 Thorsten Hapke thorsten.hapke@sap.com
+
+  SPDX-License-Identifier: Apache-2.0
+-->
 # Replication with SAP Data Intelligence
 
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/data-intelligence-replication)](https://api.reuse.software/info/github.com/SAP-samples/data-intelligence-replication)

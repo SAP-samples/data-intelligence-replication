@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  SPDX-FileCopyrightText: 2021 Thorsten Hapke thorsten.hapke@sap.com
+
+  SPDX-License-Identifier: Apache-2.0
+-->
 <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
   <g transform="matrix(1, 0, 0, 1, 35.838478, -31.818142)">
     <rect x="-14.709" y="79.232" width="227.283" height="283.808" style="fill: rgb(216, 216, 216); stroke-width: 11px; stroke: rgb(90, 90, 90);"/>
